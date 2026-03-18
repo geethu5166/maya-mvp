@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>MAYA — Security Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: 'Courier New', monospace; background:#0a0e17; color:#e0e0e0; }
+.topbar { background:#0d1117; border-bottom:1px solid #1D9E75; padding:14px 24px; display:flex; align-items:center; justify-content:space-between; }
+.logo { font-size:22px; font-weight:bold; color:#1D9E75; letter-spacing:3px; }
+.logo span { color:#e0e0e0; }
+.live { display:flex; align-items:center; gap:8px; font-size:12px; color:#1D9E75; }
+.live-dot { width:8px; height:8px; background:#1D9E75; border-radius:50%; animation:pulse 1.5s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.stats { display:grid; grid-template-columns:repeat(6,1fr); gap:12px; padding:20px 24px; }
+.stat { background:#0d1117; border:1px solid #1a2332; border-radius:6px; padding:16px; text-align:center; }
+.stat-num { font-size:28px; font-weight:bold; color:#1D9E75; }
+.stat-num.red { color:#e53935; }
+.stat-num.orange { color:#ff9800; }
+.stat-num.blue { color:#42a5f5; }
+.stat-label { font-size:11px; color:#666; margin-top:4px; text-transform:uppercase; letter-spacing:1px; }
+.main { padding:0 24px 24px; }
+.section-title { font-size:12px; color:#1D9E75; text-transform:uppercase; letter-spacing:2px; margin-bottom:12px; padding-bottom:6px; border-bottom:1px solid #1a2332; }
+.feed { background:#0d1117; border:1px solid #1a2332; border-radius:6px; overflow:hidden; }
+.feed-header { display:grid; grid-template-columns:160px 120px 180px 80px 1fr; padding:10px 16px; font-size:11px; color:#666; text-transform:uppercase; letter-spacing:1px; border-bottom:1px solid #1a2332; background:#080c12; }
+.feed-row { display:grid; grid-template-columns:160px 120px 180px 80px 1fr; padding:10px 16px; font-size:12px; border-bottom:1px solid #0d1520; animation:fadeIn 0.3s ease; align-items:center; }
+@keyframes fadeIn { from{opacity:0;background:#1D9E7520} to{opacity:1} }
+.feed-row:hover { background:#0d1520; }
+.badge { display:inline-block; padding:2px 8px; border-radius:3px; font-size:10px; font-weight:bold; letter-spacing:0.5px; }
+.badge.CRITICAL { background:#3d0000; color:#e53935; border:1px solid #e53935; }
+.badge.HIGH { background:#3d1a00; color:#ff9800; border:1px solid #ff9800; }
+.badge.MEDIUM { background:#3d3000; color:#ffd600; border:1px solid #ffd600; }
+.badge.LOW { background:#0d2a1a; color:#1D9E75; border:1px solid #1D9E75; }
+.type-badge { font-size:10px; color:#42a5f5; background:#0d1f3d; padding:2px 8px; border-radius:3px; border:1px solid #1a3a6b; }
+.detail { color:#888; font-size:11px; }
+.ip { color:#42a5f5; }
+.time { color:#555; font-size:11px; }
+.empty { padding:40px; text-align:center; color:#333; font-size:13px; }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="logo">M<span>AYA</span></div>
+  <div style="font-size:12px;color:#555;">Autonomous Deception & Security Platform</div>
+  <div class="live"><div class="live-dot"></div>LIVE MONITORING</div>
+</div>
+<div class="stats">
+  <div class="stat"><div class="stat-num" id="total">{{ stats.total }}</div><div class="stat-label">Total Attacks</div></div>
+  <div class="stat"><div class="stat-num red" id="critical">{{ stats.critical }}</div><div class="stat-label">Critical</div></div>
+  <div class="stat"><div class="stat-num orange" id="high">{{ stats.high }}</div><div class="stat-label">High</div></div>
+  <div class="stat"><div class="stat-num blue" id="unique_ips">{{ stats.unique_ips }}</div><div class="stat-label">Unique IPs</div></div>
+  <div class="stat"><div class="stat-num" id="ssh">{{ stats.ssh }}</div><div class="stat-label">SSH Attacks</div></div>
+  <div class="stat"><div class="stat-num" id="web">{{ stats.web }}</div><div class="stat-label">Web Attacks</div></div>
+</div>
+<div class="main">
+  <div class="section-title">Live Attack Feed</div>
+  <div class="feed">
+    <div class="feed-header">
+      <span>Timestamp</span>
+      <span>Attacker IP</span>
+      <span>Type</span>
+      <span>Severity</span>
+      <span>Details</span>
+    </div>
+    <div id="feed-body">
+    {% if attacks %}
+      {% for a in attacks %}
+      <div class="feed-row">
+        <span class="time">{{ a.timestamp[:19].replace('T',' ') }}</span>
+        <span class="ip">{{ a.attacker_ip }}</span>
+        <span><span class="type-badge">{{ a.type }}</span></span>
+        <span><span class="badge {{ a.severity }}">{{ a.severity }}</span></span>
+        <span class="detail">
+          {% if a.type == 'SSH_BRUTE_FORCE' %}
+            user: {{ a.username_tried }} | pass: {{ a.password_tried }}
+          {% elif a.type == 'WEB_CREDENTIAL_HARVEST' %}
+            credentials: {{ a.credentials }}
+          {% elif a.type == 'WEB_SCAN' %}
+            path: {{ a.path }}
+          {% else %}
+            path: {{ a.path if a.path is defined else 'N/A' }}
+          {% endif %}
+        </span>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="empty">No attacks detected yet. Honeypots active and waiting...</div>
+    {% endif %}
+    </div>
+  </div>
+</div>
+<script>
+var socket = io();
+socket.on('update', function(data) {
+  document.getElementById('total').textContent = data.stats.total;
+  document.getElementById('critical').textContent = data.stats.critical;
+  document.getElementById('high').textContent = data.stats.high;
+  document.getElementById('unique_ips').textContent = data.stats.unique_ips;
+  document.getElementById('ssh').textContent = data.stats.ssh;
+  document.getElementById('web').textContent = data.stats.web;
+  var attacks = data.attacks.slice().reverse();
+  var html = '';
+  attacks.forEach(function(a) {
+    var detail = '';
+    if (a.type === 'SSH_BRUTE_FORCE') {
+      detail = 'user: ' + a.username_tried + ' | pass: ' + a.password_tried;
+    } else if (a.type === 'WEB_CREDENTIAL_HARVEST') {
+      detail = 'credentials: ' + a.credentials;
+    } else if (a.type === 'WEB_SCAN') {
+      detail = 'path: ' + a.path;
+    } else {
+      detail = 'path: ' + (a.path || 'N/A');
+    }
+    html += '<div class="feed-row">' +
+      '<span class="time">' + a.timestamp.substring(0,19).replace('T',' ') + '</span>' +
+      '<span class="ip">' + a.attacker_ip + '</span>' +
+      '<span><span class="type-badge">' + a.type + '</span></span>' +
+      '<span><span class="badge ' + a.severity + '">' + a.severity + '</span></span>' +
+      '<span class="detail">' + detail + '</span>' +
+      '</div>';
+  });
+  document.getElementById('feed-body').innerHTML = html || '<div class="empty">No attacks yet...</div>';
+});
+</script>
+</body>
+</html>
