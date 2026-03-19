@@ -1,0 +1,2 @@
+{"timestamp": "2026-03-19T15:15:12.097562", "action": "IP_BLOCKED", "details": "Local IP \u2014 skipped", "attacker_ip": "127.0.0.1", "trigger": "SSH_BRUTE_FORCE", "severity": "HIGH"}
+{"timestamp": "2026-03-19T15:15:18.113711", "action": "IP_BLOCKED", "details": "Local IP \u2014 skipped", "attacker_ip": "127.0.0.1", "trigger": "SSH_BRUTE_FORCE", "severity": "HIGH"}
