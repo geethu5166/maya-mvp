@@ -1,0 +1,8 @@
+data/cicids2018.csv
+data/nslkdd_train.txt
+data/nslkdd_test.txt
+data/kddcup.gz
+venv/
+__pycache__/
+*.pyc
+*.pkl
