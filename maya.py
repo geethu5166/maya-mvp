@@ -85,3 +85,9 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+def start_threat_intel():
+    time.sleep(4)
+    print("[MAYA] Starting Threat Intelligence Engine...")
+    from detection.threat_intelligence import run_continuous_intel
+    run_continuous_intel()

@@ -1,0 +1,362 @@
+[
+  {
+    "category": "hacking_news",
+    "title": "Speagle Malware Hijacks Cobra DocGuard to Steal Data via Compromised Servers",
+    "summary": "Cybersecurity researchers have flagged a new malware dubbed Speagle that hijacks the functionality and infrastructure of a legitimate program called Cobra DocGuard.\n\"Speagle is designed to surreptitiously harvest sensitive information from infected computers and transmit it to a Cobra DocGuard serve",
+    "link": "https://thehackernews.com/2026/03/speagle-malware-hijacks-cobra-docguard.html",
+    "published": "Fri, 20 Mar 2026 00:46:00 +0530",
+    "source": "The Hacker News",
+    "fetched_at": "2026-03-20T08:59:13.298842"
+  },
+  {
+    "category": "hacking_news",
+    "title": "54 EDR Killers Use BYOVD to Exploit 34 Signed Vulnerable Drivers and Disable Security",
+    "summary": "A new analysis of endpoint detection and response (EDR) killers has revealed that 54 of them leverage a technique known as bring your own vulnerable driver (BYOVD) by abusing a total of 34 vulnerable drivers.\nEDR killer programs have been a common presence in ransomware intrusions as they offer a wa",
+    "link": "https://thehackernews.com/2026/03/54-edr-killers-use-byovd-to-exploit-34.html",
+    "published": "Fri, 20 Mar 2026 00:22:00 +0530",
+    "source": "The Hacker News",
+    "fetched_at": "2026-03-20T08:59:13.298960"
+  },
+  {
+    "category": "hacking_news",
+    "title": "ThreatsDay Bulletin: FortiGate RaaS, Citrix Exploits, MCP Abuse, LiveChat Phish & More",
+    "summary": "ThreatsDay Bulletin is back on The Hacker News, and this week feels off in a familiar way. Nothing loud, nothing breaking everything at once. Just a lot of small things that shouldn&rsquo;t work anymore but still do.\nSome of it looks simple, almost sloppy, until you see how well it lands. Other bits",
+    "link": "https://thehackernews.com/2026/03/threatsday-bulletin-fortigate-raas.html",
+    "published": "Thu, 19 Mar 2026 19:55:00 +0530",
+    "source": "The Hacker News",
+    "fetched_at": "2026-03-20T08:59:13.298991"
+  },
+  {
+    "category": "hacking_news",
+    "title": "New Perseus Android Banking Malware Monitors Notes Apps to Extract Sensitive Data",
+    "summary": "Cybersecurity researchers have disclosed a new Android malware family called Perseus that's being actively distributed in the wild with an aim to conduct device takeover (DTO) and financial fraud.\nPerseus is built upon the foundations of Cerberus and Phoenix, at the same time evolving into a \"more f",
+    "link": "https://thehackernews.com/2026/03/new-perseus-android-banking-malware.html",
+    "published": "Thu, 19 Mar 2026 18:13:00 +0530",
+    "source": "The Hacker News",
+    "fetched_at": "2026-03-20T08:59:13.299006"
+  },
+  {
+    "category": "hacking_news",
+    "title": "How Ceros Gives Security Teams Visibility and Control in Claude Code",
+    "summary": "Security teams have spent years building identity and access controls for human users and service accounts. But a new category of actor has quietly entered most enterprise environments, and it operates entirely outside those controls.\nClaude Code, Anthropic's AI coding agent, is now running across e",
+    "link": "https://thehackernews.com/2026/03/how-ceros-gives-security-teams.html",
+    "published": "Thu, 19 Mar 2026 16:28:00 +0530",
+    "source": "The Hacker News",
+    "fetched_at": "2026-03-20T08:59:13.299020"
+  },
+  {
+    "category": "hacking_news",
+    "title": "Navia discloses data breach impacting 2.7 million people",
+    "summary": "Navia Benefit Solutions, Inc. (Navia) is informing nearly 2.7 million individuals of a data breach that exposed their sensitive information to attackers. [...]",
+    "link": "https://www.bleepingcomputer.com/news/security/navia-discloses-data-breach-impacting-27-million-people/",
+    "published": "Thu, 19 Mar 2026 16:43:54 -0400",
+    "source": "BleepingComputer",
+    "fetched_at": "2026-03-20T08:59:13.930740"
+  },
+  {
+    "category": "hacking_news",
+    "title": "New \u2018PolyShell\u2019 flaw allows unauthenticated RCE on Magento e-stores",
+    "summary": "A newly disclosed vulnerability dubbed 'PolyShell' affects all Magento Open Source and Adobe Commerce stable version 2 installations, allowing unauthenticated code execution and account takeover. [...]",
+    "link": "https://www.bleepingcomputer.com/news/security/new-polyshell-flaw-allows-unauthenticated-rce-on-magento-e-stores/",
+    "published": "Thu, 19 Mar 2026 16:01:03 -0400",
+    "source": "BleepingComputer",
+    "fetched_at": "2026-03-20T08:59:13.930796"
+  },
+  {
+    "category": "hacking_news",
+    "title": "Bitrefill blames North Korean Lazarus group for cyberattack",
+    "summary": "Crypto-powered gift card store Bitrefill says that the attack it suffered at the beginning of the month was likely perpetrated by North Korean hackers of the\u00a0Bluenoroff group. [...]",
+    "link": "https://www.bleepingcomputer.com/news/security/bitrefill-blames-north-korean-lazarus-group-for-cyberattack/",
+    "published": "Thu, 19 Mar 2026 13:08:24 -0400",
+    "source": "BleepingComputer",
+    "fetched_at": "2026-03-20T08:59:13.930811"
+  },
+  {
+    "category": "hacking_news",
+    "title": "FBI seizes Handala data leak site after Stryker cyberattack",
+    "summary": "The FBI has seized two websites used by the Handala hacktivist group after the threat actors conducted a destructive cyberattack on medical technology giant Stryker that wiped approximately 80,000 devices. [...]",
+    "link": "https://www.bleepingcomputer.com/news/security/fbi-seizes-handala-data-leak-site-after-stryker-cyberattack/",
+    "published": "Thu, 19 Mar 2026 12:14:13 -0400",
+    "source": "BleepingComputer",
+    "fetched_at": "2026-03-20T08:59:13.930820"
+  },
+  {
+    "category": "hacking_news",
+    "title": "Russian hackers exploit Zimbra flaw in Ukrainian govt attacks",
+    "summary": "Hackers part of APT28, a state-backed threat\u00a0group linked to Russia's military intelligence service (GRU), are exploiting a Zimbra Collaboration Suite (ZCS) vulnerability in attacks targeting Ukrainian government entities. [...]",
+    "link": "https://www.bleepingcomputer.com/news/security/russian-apt28-military-hackers-exploit-zimbra-flaw-in-ukrainian-govt-attacks/",
+    "published": "Thu, 19 Mar 2026 10:55:50 -0400",
+    "source": "BleepingComputer",
+    "fetched_at": "2026-03-20T08:59:13.930829"
+  },
+  {
+    "category": "hacking_news",
+    "title": "Oasis Security Raises $120 Million for Agentic Access Management",
+    "summary": "<p>The company will invest in R&#038;D, product expansion across AI frameworks, and in scaling go-to-market and sales efforts.</p>\n<p>The post <a href=\"https://www.securityweek.com/oasis-security-raises-120-million-for-agentic-access-management/\">Oasis Security Raises $120 Million for Agentic Access",
+    "link": "https://www.securityweek.com/oasis-security-raises-120-million-for-agentic-access-management/",
+    "published": "Thu, 19 Mar 2026 18:23:15 +0000",
+    "source": "SecurityWeek",
+    "fetched_at": "2026-03-20T08:59:16.787137"
+  },
+  {
+    "category": "hacking_news",
+    "title": "1stProtect Emerges From Stealth With $20 Million in Funding",
+    "summary": "<p>The company\u2019s endpoint security platform monitors behavior and verifies user intent to stop cyberattacks in real time.</p>\n<p>The post <a href=\"https://www.securityweek.com/1stprotect-emerges-from-stealth-with-20-million-in-funding/\">1stProtect Emerges From Stealth With $20 Million in Funding</a>",
+    "link": "https://www.securityweek.com/1stprotect-emerges-from-stealth-with-20-million-in-funding/",
+    "published": "Thu, 19 Mar 2026 17:55:10 +0000",
+    "source": "SecurityWeek",
+    "fetched_at": "2026-03-20T08:59:16.787321"
+  },
+  {
+    "category": "hacking_news",
+    "title": "Critical ScreenConnect Vulnerability Exposes Machine Keys",
+    "summary": "<p>Latest ScreenConnect version adds encrypted storage and management to prevent unauthorized access to machine keys.</p>\n<p>The post <a href=\"https://www.securityweek.com/critical-screenconnect-vulnerability-exposes-machine-keys/\">Critical ScreenConnect Vulnerability Exposes Machine Keys</a> appear",
+    "link": "https://www.securityweek.com/critical-screenconnect-vulnerability-exposes-machine-keys/",
+    "published": "Thu, 19 Mar 2026 17:40:03 +0000",
+    "source": "SecurityWeek",
+    "fetched_at": "2026-03-20T08:59:16.787358"
+  },
+  {
+    "category": "hacking_news",
+    "title": "Privacy Platform Cloaked Raises $375M to Expand Enterprise Reach",
+    "summary": "<p>Cloaked plans to introduce AI agents designed to act on behalf of users to monitor, manage, and enforce privacy preferences and security postures.</p>\n<p>The post <a href=\"https://www.securityweek.com/privacy-platform-cloaked-raises-375m-to-expand-consumer-tools-and-enterprise-reach/\">Privacy Pla",
+    "link": "https://www.securityweek.com/privacy-platform-cloaked-raises-375m-to-expand-consumer-tools-and-enterprise-reach/",
+    "published": "Thu, 19 Mar 2026 17:32:29 +0000",
+    "source": "SecurityWeek",
+    "fetched_at": "2026-03-20T08:59:16.787391"
+  },
+  {
+    "category": "hacking_news",
+    "title": "Iran Readied Cyberattack Capabilities for Response Prior to Epic Fury",
+    "summary": "<p>Analysis reveals a six-month buildup of Iran-linked cyber infrastructure, including US-based shell companies, designed to weather kinetic strikes and ensure the resilience of its global hacking operations.</p>\n<p>The post <a href=\"https://www.securityweek.com/iran-readied-cyberattack-capabilities",
+    "link": "https://www.securityweek.com/iran-readied-cyberattack-capabilities-for-response-prior-to-epic-fury/",
+    "published": "Thu, 19 Mar 2026 15:30:00 +0000",
+    "source": "SecurityWeek",
+    "fetched_at": "2026-03-20T08:59:16.787410"
+  },
+  {
+    "category": "hacking_news",
+    "title": "AI Conundrum: Why MCP Security Can't Be Patched Away",
+    "summary": "MCP introduces security risks into LLM environments that are architectural and not easily fixable, researcher says at RSAC 2026 Conference.",
+    "link": "https://www.darkreading.com/application-security/mcp-security-patched",
+    "published": "Thu, 19 Mar 2026 21:54:38 GMT",
+    "source": "darkreading",
+    "fetched_at": "2026-03-20T08:59:18.411599"
+  },
+  {
+    "category": "hacking_news",
+    "title": "EU Sanctions Companies in China, Iran for Cyberattacks",
+    "summary": "These rulings prohibit the entities from entering or doing business in the European Union.",
+    "link": "https://www.darkreading.com/threat-intelligence/eu-sanctions-companies-china-iran-cyberattacks",
+    "published": "Thu, 19 Mar 2026 07:01:00 GMT",
+    "source": "darkreading",
+    "fetched_at": "2026-03-20T08:59:18.411657"
+  },
+  {
+    "category": "hacking_news",
+    "title": "C2 Implant 'SnappyClient' Targets Crypto Wallets",
+    "summary": "In addition to enabling remote access, the malware supports a wide range of capabilities, including data theft and spying.",
+    "link": "https://www.darkreading.com/cyberattacks-data-breaches/new-c2-implant-snappyclient-targets-crypto-wallets",
+    "published": "Wed, 18 Mar 2026 21:49:02 GMT",
+    "source": "darkreading",
+    "fetched_at": "2026-03-20T08:59:18.411672"
+  },
+  {
+    "category": "hacking_news",
+    "title": "DarkSword: iPhone Exploit Kit Serves Spies &amp; Thieves Alike",
+    "summary": "A sophisticated iOS exploit chain leverages multiple zero-day vulnerabilities and is targeting users in Saudi Arabia, Turkey, Malaysia, and Ukraine.",
+    "link": "https://www.darkreading.com/threat-intelligence/darksword-iphone-exploit-spies-thieves",
+    "published": "Wed, 18 Mar 2026 21:15:38 GMT",
+    "source": "darkreading",
+    "fetched_at": "2026-03-20T08:59:18.411680"
+  },
+  {
+    "category": "hacking_news",
+    "title": "'Claudy Day\u2019 Trio of Flaws Exposes Claude Users to Data Theft",
+    "summary": "A prompt injection vulnerability paired with other flaws can turn a Google search into a full attack chain that could threaten enterprise networks.",
+    "link": "https://www.darkreading.com/vulnerabilities-threats/claudy-day-trio-flaws-claude-users-data-theft",
+    "published": "Wed, 18 Mar 2026 15:05:58 GMT",
+    "source": "darkreading",
+    "fetched_at": "2026-03-20T08:59:18.411687"
+  },
+  {
+    "category": "hacking_news",
+    "title": "Student Loan Breach Exposes 2.5M Records",
+    "summary": "2.5 million people were affected, in a breach that could spell more trouble down the line.",
+    "link": "https://threatpost.com/student-loan-breach-exposes-2-5m-records/180492/",
+    "published": "Wed, 31 Aug 2022 12:57:48 +0000",
+    "source": "Threatpost",
+    "fetched_at": "2026-03-20T08:59:20.627849"
+  },
+  {
+    "category": "hacking_news",
+    "title": "Watering Hole Attacks Push ScanBox Keylogger",
+    "summary": "Researchers uncover a watering hole attack likely carried out by APT TA423, which attempts to plant the ScanBox JavaScript-based reconnaissance tool.",
+    "link": "https://threatpost.com/watering-hole-attacks-push-scanbox-keylogger/180490/",
+    "published": "Tue, 30 Aug 2022 16:00:43 +0000",
+    "source": "Threatpost",
+    "fetched_at": "2026-03-20T08:59:20.628148"
+  },
+  {
+    "category": "hacking_news",
+    "title": "Tentacles of \u20180ktapus\u2019 Threat Group Victimize 130 Firms",
+    "summary": "Over 130 companies tangled in sprawling phishing campaign that spoofed a multi-factor authentication system.",
+    "link": "https://threatpost.com/0ktapus-victimize-130-firms/180487/",
+    "published": "Mon, 29 Aug 2022 14:56:19 +0000",
+    "source": "Threatpost",
+    "fetched_at": "2026-03-20T08:59:20.628187"
+  },
+  {
+    "category": "hacking_news",
+    "title": "Ransomware Attacks are on the Rise",
+    "summary": "Lockbit is by far this summer\u2019s most prolific ransomware group, trailed by two offshoots of the Conti group.",
+    "link": "https://threatpost.com/ransomware-attacks-are-on-the-rise/180481/",
+    "published": "Fri, 26 Aug 2022 16:44:27 +0000",
+    "source": "Threatpost",
+    "fetched_at": "2026-03-20T08:59:20.628207"
+  },
+  {
+    "category": "hacking_news",
+    "title": "Cybercriminals Are Selling Access to Chinese Surveillance Cameras",
+    "summary": "Tens of thousands of cameras have failed to patch a critical, 11-month-old CVE, leaving thousands of organizations exposed.",
+    "link": "https://threatpost.com/cybercriminals-are-selling-access-to-chinese-surveillance-cameras/180478/",
+    "published": "Thu, 25 Aug 2022 18:47:15 +0000",
+    "source": "Threatpost",
+    "fetched_at": "2026-03-20T08:59:20.628222"
+  },
+  {
+    "category": "hacking_news",
+    "title": "Water utilities need hands-on cybersecurity help, not just free guidance, pilot program finds",
+    "summary": "<figure><div><img src=\"https://imgproxy.divecdn.com/xuMw_pnwGfNNzvL6WN53aVNXScz73K8FLrmmabeGEb0/g:ce/rs:fill:1600:900:1/Z3M6Ly9kaXZlc2l0ZS1zdG9yYWdlL2RpdmVpbWFnZS9HZXR0eUltYWdlcy0yMTc0MTA2MjM0LmpwZw==.webp\" /></div></figure><p>In a new report, Microsoft criticized the federal government for scaling ",
+    "link": "https://www.cybersecuritydive.com/news/water-cybersecurity-microsoft-pilot-program-lessons/815196/",
+    "published": "Thu, 19 Mar 2026 11:16:00 -0400",
+    "source": "Cybersecurity Dive - Latest News",
+    "fetched_at": "2026-03-20T08:59:21.851786"
+  },
+  {
+    "category": "hacking_news",
+    "title": "CISA urges organizations to harden endpoint security following Stryker attack",
+    "summary": "<figure><div><img src=\"https://imgproxy.divecdn.com/v5ZwxHS6ZFhwHbLAmpWOWj1Seoc_bnNS6vCuMm05zL4/g:ce/rs:fill:1600:900:1/Z3M6Ly9kaXZlc2l0ZS1zdG9yYWdlL2RpdmVpbWFnZS9NaWNyb3NvZnRfR2V0dHlJbWFnZXMtMTUwOTMxMDM4My5qcGc=.webp\" /></div></figure><p>The agency is coordinating with the FBI and other agencies am",
+    "link": "https://www.cybersecuritydive.com/news/cisa-organizations-harden-endpoint-security-stryker-attack/815193/",
+    "published": "Thu, 19 Mar 2026 10:32:46 -0400",
+    "source": "Cybersecurity Dive - Latest News",
+    "fetched_at": "2026-03-20T08:59:21.851852"
+  },
+  {
+    "category": "hacking_news",
+    "title": "Threat groups target cyber-physical systems to disrupt critical infrastructure providers",
+    "summary": "<figure><div><img src=\"https://imgproxy.divecdn.com/-x_1UzDLDvVr0B0JMHHtEv0B4nGInBoR6iFjK_w1wnc/g:ce/rs:fill:1600:900:1/Z3M6Ly9kaXZlc2l0ZS1zdG9yYWdlL2RpdmVpbWFnZS9HZXR0eUltYWdlcy0xNDExNDM3NjI1LmpwZw==.webp\" /></div></figure><p>The Iran war has raised concerns that key industrial sectors could be the",
+    "link": "https://www.cybersecuritydive.com/news/threat-groups-target-cyber-physical-systems-to-disrupt-critical-infrastruct/815074/",
+    "published": "Wed, 18 Mar 2026 11:19:21 -0400",
+    "source": "Cybersecurity Dive - Latest News",
+    "fetched_at": "2026-03-20T08:59:21.851865"
+  },
+  {
+    "category": "hacking_news",
+    "title": "Stryker begins restoring ordering, shipping systems after cyberattack",
+    "summary": "<figure><div><img src=\"https://imgproxy.divecdn.com/4gQBQ_4pgZA16ab4dxbwcG5FnFvNWHyE_q_FgS5JP1E/g:ce/rs:fill:1600:900:1/Z3M6Ly9kaXZlc2l0ZS1zdG9yYWdlL2RpdmVpbWFnZS8yVEMzQU5NLmpwZw==.webp\" /></div></figure><p>The medtech company believes the cyberattack has been contained and is now bringing systems b",
+    "link": "https://www.cybersecuritydive.com/news/stryker-restoring-ordering-shipping-cyberattack/815040/",
+    "published": "Wed, 18 Mar 2026 11:00:00 -0400",
+    "source": "Cybersecurity Dive - Latest News",
+    "fetched_at": "2026-03-20T08:59:21.851875"
+  },
+  {
+    "category": "hacking_news",
+    "title": "New research unpacks North Korea\u2019s stealthy, sophisticated remote IT worker schemes",
+    "summary": "<figure><div><img src=\"https://imgproxy.divecdn.com/ibeE2-hblJ9tlc8lDLa-u9wEZEGVfPLc9fVUCezp1eI/g:ce/rs:fill:1600:900:1/Z3M6Ly9kaXZlc2l0ZS1zdG9yYWdlL2RpdmVpbWFnZS9HZXR0eUltYWdlcy0xMzI3ODc3NDU1LmpwZw==.webp\" /></div></figure><p>The report recommends that businesses practice several forms of vigilance",
+    "link": "https://www.cybersecuritydive.com/news/north-korea-remote-it-worker-ibm-flare/815063/",
+    "published": "Wed, 18 Mar 2026 10:54:34 -0400",
+    "source": "Cybersecurity Dive - Latest News",
+    "fetched_at": "2026-03-20T08:59:21.851884"
+  },
+  {
+    "category": "exploit_db",
+    "title": "[webapps] WordPress Backup Migration 1.3.7 - Remote Command Execution",
+    "summary": "WordPress Backup Migration 1.3.7 - Remote Command Execution",
+    "link": "https://www.exploit-db.com/exploits/52486",
+    "published": "Tue, 03 Mar 2026 00:00:00 +0000",
+    "source": "Exploit-DB.com RSS Feed",
+    "fetched_at": "2026-03-20T08:59:26.169132"
+  },
+  {
+    "category": "exploit_db",
+    "title": "[webapps] mailcow 2025-01a - Host Header Password Reset Poisoning",
+    "summary": "mailcow 2025-01a - Host Header Password Reset Poisoning",
+    "link": "https://www.exploit-db.com/exploits/52485",
+    "published": "Tue, 03 Mar 2026 00:00:00 +0000",
+    "source": "Exploit-DB.com RSS Feed",
+    "fetched_at": "2026-03-20T08:59:26.169231"
+  },
+  {
+    "category": "exploit_db",
+    "title": "[webapps] Easy File Sharing Web Server v7.2 - Buffer Overflow",
+    "summary": "Easy File Sharing Web Server v7.2 - Buffer Overflow",
+    "link": "https://www.exploit-db.com/exploits/52484",
+    "published": "Tue, 03 Mar 2026 00:00:00 +0000",
+    "source": "Exploit-DB.com RSS Feed",
+    "fetched_at": "2026-03-20T08:59:26.169476"
+  },
+  {
+    "category": "exploit_db",
+    "title": "[webapps] WeGIA 3.5.0 - SQL Injection",
+    "summary": "WeGIA 3.5.0 - SQL Injection",
+    "link": "https://www.exploit-db.com/exploits/52483",
+    "published": "Tue, 03 Mar 2026 00:00:00 +0000",
+    "source": "Exploit-DB.com RSS Feed",
+    "fetched_at": "2026-03-20T08:59:26.169507"
+  },
+  {
+    "category": "exploit_db",
+    "title": "[webapps] Boss Mini v1.4.0 - Local File Inclusion (LFI)",
+    "summary": "Boss Mini v1.4.0 - Local File Inclusion (LFI)",
+    "link": "https://www.exploit-db.com/exploits/52482",
+    "published": "Tue, 03 Mar 2026 00:00:00 +0000",
+    "source": "Exploit-DB.com RSS Feed",
+    "fetched_at": "2026-03-20T08:59:26.169521"
+  },
+  {
+    "category": "vulnerability",
+    "title": "CVE-2017-20187",
+    "summary": "** UNSUPPPORTED WHEN ASSIGNED ** ** UNSUPPORTED WHEN ASSIGNED ** A vulnerability was found in Magnesium-PHP up to 0.3.0. It has been classified as problematic. Affected is the function formatEmailString of the file src/Magnesium/Message/Base.php. The manipulation of the argument email/name leads to ",
+    "link": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-20187",
+    "published": "",
+    "source": "National Vulnerability Database",
+    "fetched_at": "2026-03-20T08:59:28.070384"
+  },
+  {
+    "category": "vulnerability",
+    "title": "CVE-2017-7252",
+    "summary": "bcrypt password hashing in Botan before 2.1.0 does not correctly handle passwords with a length between 57 and 72 characters, which makes it easier for attackers to determine the cleartext password.",
+    "link": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-7252",
+    "published": "",
+    "source": "National Vulnerability Database",
+    "fetched_at": "2026-03-20T08:59:28.070524"
+  },
+  {
+    "category": "vulnerability",
+    "title": "CVE-2018-25092",
+    "summary": "A vulnerability was found in Vaerys-Dawn DiscordSailv2 up to 2.10.2. It has been declared as critical. Affected by this vulnerability is an unknown functionality of the component Command Mention Handler. The manipulation leads to improper access controls. Upgrading to version 2.10.3 is able to addre",
+    "link": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2018-25092",
+    "published": "",
+    "source": "National Vulnerability Database",
+    "fetched_at": "2026-03-20T08:59:28.070542"
+  },
+  {
+    "category": "vulnerability",
+    "title": "CVE-2018-25093",
+    "summary": "A vulnerability was found in Vaerys-Dawn DiscordSailv2 up to 2.10.2. It has been rated as critical. Affected by this issue is some unknown functionality of the component Tag Handler. The manipulation leads to improper access controls. Upgrading to version 2.10.3 is able to address this issue. The na",
+    "link": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2018-25093",
+    "published": "",
+    "source": "National Vulnerability Database",
+    "fetched_at": "2026-03-20T08:59:28.070549"
+  },
+  {
+    "category": "vulnerability",
+    "title": "CVE-2020-28407",
+    "summary": "In swtpm before 0.4.2 and 0.5.x before 0.5.1, a local attacker may be able to overwrite arbitrary files via a symlink attack against a temporary file such as TMP2-00.permall.",
+    "link": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2020-28407",
+    "published": "",
+    "source": "National Vulnerability Database",
+    "fetched_at": "2026-03-20T08:59:28.070557"
+  }
+]

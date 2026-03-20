@@ -1,0 +1,66 @@
+<script>
+// Add pricing section dynamically
+document.addEventListener('DOMContentLoaded', function() {
+  const pricing = `
+  <section style="padding:80px 5%;background:#080c12;" id="pricing">
+    <div style="max-width:1100px;margin:0 auto;text-align:center;">
+      <span style="font-size:11px;color:#00c896;text-transform:uppercase;letter-spacing:2px;font-weight:600;">Pricing</span>
+      <h2 style="font-size:40px;font-weight:800;margin:12px 0 16px;letter-spacing:-0.5px;">Simple. Transparent. Indian.</h2>
+      <p style="color:#888;font-size:16px;margin-bottom:48px;">No hidden fees. No long contracts. Cancel anytime.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;max-width:900px;margin:0 auto;">
+        
+        <div style="background:#0d1117;border:1px solid #1a2332;border-radius:16px;padding:36px;text-align:left;">
+          <div style="font-size:13px;color:#888;font-weight:600;margin-bottom:12px;">STARTER</div>
+          <div style="font-size:40px;font-weight:800;color:#fff;">₹15,000<span style="font-size:16px;color:#888;font-weight:400;">/month</span></div>
+          <div style="font-size:13px;color:#888;margin:8px 0 24px;">For startups up to 50 employees</div>
+          <div style="border-top:1px solid #1a2332;padding-top:24px;">
+            <div style="font-size:14px;color:#ccc;margin-bottom:12px;">✓ SSH + Web Honeypots</div>
+            <div style="font-size:14px;color:#ccc;margin-bottom:12px;">✓ AI Detection Engine</div>
+            <div style="font-size:14px;color:#ccc;margin-bottom:12px;">✓ Live Dashboard</div>
+            <div style="font-size:14px;color:#ccc;margin-bottom:12px;">✓ Email Alerts</div>
+            <div style="font-size:14px;color:#ccc;margin-bottom:24px;">✓ Monthly Report</div>
+            <a href="#contact" style="display:block;padding:12px;background:transparent;border:1px solid #1a2332;color:#fff;border-radius:8px;font-size:14px;font-weight:600;text-decoration:none;text-align:center;">Get Started</a>
+          </div>
+        </div>
+
+        <div style="background:#0d1117;border:2px solid #00c896;border-radius:16px;padding:36px;text-align:left;position:relative;">
+          <div style="position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:#00c896;color:#000;font-size:11px;font-weight:800;padding:4px 16px;border-radius:20px;white-space:nowrap;">MOST POPULAR</div>
+          <div style="font-size:13px;color:#00c896;font-weight:600;margin-bottom:12px;">PROFESSIONAL</div>
+          <div style="font-size:40px;font-weight:800;color:#fff;">₹40,000<span style="font-size:16px;color:#888;font-weight:400;">/month</span></div>
+          <div style="font-size:13px;color:#888;margin:8px 0 24px;">For companies up to 500 employees</div>
+          <div style="border-top:1px solid #1a2332;padding-top:24px;">
+            <div style="font-size:14px;color:#ccc;margin-bottom:12px;">✓ Everything in Starter</div>
+            <div style="font-size:14px;color:#ccc;margin-bottom:12px;">✓ Mistral AI Brain</div>
+            <div style="font-size:14px;color:#ccc;margin-bottom:12px;">✓ Autonomous Response</div>
+            <div style="font-size:14px;color:#ccc;margin-bottom:12px;">✓ SOC AI Analyst</div>
+            <div style="font-size:14px;color:#ccc;margin-bottom:12px;">✓ Threat Intelligence Feed</div>
+            <div style="font-size:14px;color:#ccc;margin-bottom:12px;">✓ India Threat Intel</div>
+            <div style="font-size:14px;color:#ccc;margin-bottom:24px;">✓ Weekly PDF Reports</div>
+            <a href="#contact" style="display:block;padding:12px;background:#00c896;color:#000;border-radius:8px;font-size:14px;font-weight:700;text-decoration:none;text-align:center;">Get Started</a>
+          </div>
+        </div>
+
+        <div style="background:#0d1117;border:1px solid #1a2332;border-radius:16px;padding:36px;text-align:left;">
+          <div style="font-size:13px;color:#888;font-weight:600;margin-bottom:12px;">ENTERPRISE</div>
+          <div style="font-size:40px;font-weight:800;color:#fff;">Custom</div>
+          <div style="font-size:13px;color:#888;margin:8px 0 24px;">For banks, NBFCs, large enterprises</div>
+          <div style="border-top:1px solid #1a2332;padding-top:24px;">
+            <div style="font-size:14px;color:#ccc;margin-bottom:12px;">✓ Everything in Professional</div>
+            <div style="font-size:14px;color:#ccc;margin-bottom:12px;">✓ Custom AI Training</div>
+            <div style="font-size:14px;color:#ccc;margin-bottom:12px;">✓ Dedicated Deployment</div>
+            <div style="font-size:14px;color:#ccc;margin-bottom:12px;">✓ RBI Compliance Reports</div>
+            <div style="font-size:14px;color:#ccc;margin-bottom:12px;">✓ 24/7 Support</div>
+            <div style="font-size:14px;color:#ccc;margin-bottom:24px;">✓ SLA Guarantee</div>
+            <a href="mailto:Geetheswara@Vaultrap.com" style="display:block;padding:12px;background:transparent;border:1px solid #1a2332;color:#fff;border-radius:8px;font-size:14px;font-weight:600;text-decoration:none;text-align:center;">Contact Us</a>
+          </div>
+        </div>
+
+      </div>
+      <p style="margin-top:32px;font-size:14px;color:#555;">All plans include 30-day free pilot. No credit card required to start.</p>
+    </div>
+  </section>`;
+  
+  const ctaSection = document.getElementById('contact');
+  ctaSection.insertAdjacentHTML('beforebegin', pricing);
+});
+</script>
