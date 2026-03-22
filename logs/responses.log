@@ -19,3 +19,6 @@
 {"timestamp": "2026-03-22T17:43:22.535427", "action": "IP_BLOCKED", "details": "Local IP \u2014 skipped", "attacker_ip": "127.0.0.1", "trigger": "DB_CONNECTION", "severity": "HIGH"}
 {"timestamp": "2026-03-22T18:57:29.869139", "action": "IP_BLOCKED", "details": "Block failed: Command '['sudo', 'iptables', '-A', 'INPUT', '-s', '185.220.101.47', '-j', 'DROP']' timed out after 5 seconds", "attacker_ip": "185.220.101.47", "trigger": "HONEYTOKEN_TRIGGERED", "severity": "CRITICAL"}
 {"timestamp": "2026-03-22T18:57:29.869139", "action": "EMAIL_ALERT_FAILED", "details": "Alert sent to security team", "attacker_ip": "185.220.101.47", "trigger": "HONEYTOKEN_TRIGGERED", "severity": "CRITICAL"}
+{"timestamp": "2026-03-22T19:21:49.472909", "action": "MONITORING_INCREASED", "details": "Increased monitoring for 127.0.0.1", "attacker_ip": "127.0.0.1", "trigger": "POLYMORPHIC_WEB_PROBE", "severity": "MEDIUM"}
+{"timestamp": "2026-03-22T19:21:50.486189", "action": "MONITORING_INCREASED", "details": "Increased monitoring for 127.0.0.1", "attacker_ip": "127.0.0.1", "trigger": "POLYMORPHIC_WEB_PROBE", "severity": "MEDIUM"}
+{"timestamp": "2026-03-22T19:23:32.590162", "action": "MONITORING_INCREASED", "details": "Increased monitoring for 127.0.0.1", "attacker_ip": "127.0.0.1", "trigger": "POLYMORPHIC_WEB_PROBE", "severity": "MEDIUM"}

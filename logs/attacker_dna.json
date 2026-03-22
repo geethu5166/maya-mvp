@@ -1,0 +1,333 @@
+{
+  "profiles": {
+    "127.0.0.1": {
+      "ip": "127.0.0.1",
+      "dna_hash": "8ffacb1f61f73754",
+      "dna_string": "seq:SSH_BRUTE_FORCE_SSH_BRUTE_FORCE_WEB_RECON_WEB_CREDENTIAL_HARVEST_WEB_RECON_WEB_CREDENTIAL_HARVEST_WEB_RECON_WEB_CREDENTIAL_HARVEST_WEB_CREDENTIAL_HARVEST_WEB_RECON_WEB_RECON_SSH_BRUTE_FORCE_SSH_BRUTE_FORCE_WEB_RECON_WEB_RECON_WEB_RECON_DB_LOGIN_ATTEMPT_DB_CONNECTION|time:AFTERNOON|speed:SLOW|users:admin,root|tool:Mozilla/5.0 (X11; Linux x86_64",
+      "first_seen": "2026-03-18T21:40:57.421940",
+      "last_seen": "2026-03-22T17:43:21.962439",
+      "total_attacks": 18,
+      "features": {
+        "attack_sequence": [
+          "SSH_BRUTE_FORCE",
+          "SSH_BRUTE_FORCE",
+          "WEB_RECON",
+          "WEB_CREDENTIAL_HARVEST",
+          "WEB_RECON",
+          "WEB_CREDENTIAL_HARVEST",
+          "WEB_RECON",
+          "WEB_CREDENTIAL_HARVEST",
+          "WEB_CREDENTIAL_HARVEST",
+          "WEB_RECON",
+          "WEB_RECON",
+          "SSH_BRUTE_FORCE",
+          "SSH_BRUTE_FORCE",
+          "WEB_RECON",
+          "WEB_RECON",
+          "WEB_RECON",
+          "DB_LOGIN_ATTEMPT",
+          "DB_CONNECTION"
+        ],
+        "preferred_hours": [
+          21,
+          21,
+          21,
+          21,
+          21,
+          21,
+          14,
+          14,
+          14,
+          14,
+          15,
+          15,
+          15,
+          8,
+          16,
+          17,
+          17,
+          17
+        ],
+        "avg_hour": 16.77777777777778,
+        "avg_gap_seconds": 19490.855323470587,
+        "min_gap_seconds": 4.23162,
+        "user_agents": [
+          "Mozilla/5.0 (X11; Linux x86_64; rv:140.0) Gecko/20100101 Firefox/140.0"
+        ],
+        "usernames_tried": [
+          "root",
+          "admin"
+        ],
+        "passwords_tried": [
+          "kali",
+          "password",
+          "123456",
+          "admin"
+        ],
+        "unique_usernames": 2,
+        "unique_passwords": 4,
+        "honeypots_targeted": [
+          "MYSQL",
+          "WEB",
+          "SSH"
+        ],
+        "target_count": 3,
+        "severity_distribution": {
+          "CRITICAL": 5,
+          "HIGH": 5,
+          "MEDIUM": 0,
+          "LOW": 8
+        }
+      },
+      "severity": "CRITICAL",
+      "classification": "APT / NATION STATE",
+      "updated_at": "2026-03-22T19:10:20.563745"
+    },
+    "185.220.101.47": {
+      "ip": "185.220.101.47",
+      "dna_hash": "b7694435b891c6e0",
+      "dna_string": "seq:WINDOWS_RDP_BRUTE_FORCE_WINDOWS_RDP_BRUTE_FORCE_HONEYTOKEN_TRIGGERED|time:AFTERNOON|speed:SLOW",
+      "first_seen": "2026-03-22T15:59:21.001065",
+      "last_seen": "2026-03-22T18:57:29.542916",
+      "total_attacks": 3,
+      "features": {
+        "attack_sequence": [
+          "WINDOWS_RDP_BRUTE_FORCE",
+          "WINDOWS_RDP_BRUTE_FORCE",
+          "HONEYTOKEN_TRIGGERED"
+        ],
+        "preferred_hours": [
+          15,
+          16,
+          18
+        ],
+        "avg_hour": 16.333333333333332,
+        "avg_gap_seconds": 5344.2709255,
+        "min_gap_seconds": 244.453747,
+        "user_agents": [],
+        "usernames_tried": [],
+        "passwords_tried": [],
+        "unique_usernames": 0,
+        "unique_passwords": 0,
+        "honeypots_targeted": [
+          "CLOUD_HONEYTOKEN",
+          "WINDOWS_AGENT"
+        ],
+        "target_count": 2,
+        "severity_distribution": {
+          "CRITICAL": 3,
+          "HIGH": 0,
+          "MEDIUM": 0,
+          "LOW": 0
+        }
+      },
+      "severity": "CRITICAL",
+      "classification": "TARGETED ATTACKER",
+      "updated_at": "2026-03-22T19:10:20.564018"
+    },
+    "45.152.66.12": {
+      "ip": "45.152.66.12",
+      "dna_hash": "b35cbe5d65d63aef",
+      "dna_string": "seq:WINDOWS_FAILED_LOGIN_WINDOWS_FAILED_LOGIN|time:AFTERNOON|speed:SLOW",
+      "first_seen": "2026-03-22T15:59:23.014584",
+      "last_seen": "2026-03-22T16:03:27.468450",
+      "total_attacks": 2,
+      "features": {
+        "attack_sequence": [
+          "WINDOWS_FAILED_LOGIN",
+          "WINDOWS_FAILED_LOGIN"
+        ],
+        "preferred_hours": [
+          15,
+          16
+        ],
+        "avg_hour": 15.5,
+        "avg_gap_seconds": 244.453866,
+        "min_gap_seconds": 244.453866,
+        "user_agents": [],
+        "usernames_tried": [],
+        "passwords_tried": [],
+        "unique_usernames": 0,
+        "unique_passwords": 0,
+        "honeypots_targeted": [
+          "WINDOWS_AGENT"
+        ],
+        "target_count": 1,
+        "severity_distribution": {
+          "CRITICAL": 0,
+          "HIGH": 2,
+          "MEDIUM": 0,
+          "LOW": 0
+        }
+      },
+      "severity": "HIGH",
+      "classification": "UNKNOWN THREAT ACTOR",
+      "updated_at": "2026-03-22T19:10:20.564940"
+    },
+    "103.216.221.15": {
+      "ip": "103.216.221.15",
+      "dna_hash": "46e6e5c362749179",
+      "dna_string": "seq:WINDOWS_LATERAL_MOVEMENT_WINDOWS_LATERAL_MOVEMENT|time:AFTERNOON|speed:SLOW",
+      "first_seen": "2026-03-22T15:59:25.018667",
+      "last_seen": "2026-03-22T16:03:29.471466",
+      "total_attacks": 2,
+      "features": {
+        "attack_sequence": [
+          "WINDOWS_LATERAL_MOVEMENT",
+          "WINDOWS_LATERAL_MOVEMENT"
+        ],
+        "preferred_hours": [
+          15,
+          16
+        ],
+        "avg_hour": 15.5,
+        "avg_gap_seconds": 244.452799,
+        "min_gap_seconds": 244.452799,
+        "user_agents": [],
+        "usernames_tried": [],
+        "passwords_tried": [],
+        "unique_usernames": 0,
+        "unique_passwords": 0,
+        "honeypots_targeted": [
+          "WINDOWS_AGENT"
+        ],
+        "target_count": 1,
+        "severity_distribution": {
+          "CRITICAL": 2,
+          "HIGH": 0,
+          "MEDIUM": 0,
+          "LOW": 0
+        }
+      },
+      "severity": "CRITICAL",
+      "classification": "UNKNOWN THREAT ACTOR",
+      "updated_at": "2026-03-22T19:10:20.565056"
+    },
+    "91.108.4.177": {
+      "ip": "91.108.4.177",
+      "dna_hash": "374f801acaf5ba65",
+      "dna_string": "seq:WINDOWS_PRIVILEGE_ESCALATION_WINDOWS_PRIVILEGE_ESCALATION|time:AFTERNOON|speed:SLOW",
+      "first_seen": "2026-03-22T15:59:27.021170",
+      "last_seen": "2026-03-22T16:03:31.477391",
+      "total_attacks": 2,
+      "features": {
+        "attack_sequence": [
+          "WINDOWS_PRIVILEGE_ESCALATION",
+          "WINDOWS_PRIVILEGE_ESCALATION"
+        ],
+        "preferred_hours": [
+          15,
+          16
+        ],
+        "avg_hour": 15.5,
+        "avg_gap_seconds": 244.456221,
+        "min_gap_seconds": 244.456221,
+        "user_agents": [],
+        "usernames_tried": [],
+        "passwords_tried": [],
+        "unique_usernames": 0,
+        "unique_passwords": 0,
+        "honeypots_targeted": [
+          "WINDOWS_AGENT"
+        ],
+        "target_count": 1,
+        "severity_distribution": {
+          "CRITICAL": 2,
+          "HIGH": 0,
+          "MEDIUM": 0,
+          "LOW": 0
+        }
+      },
+      "severity": "CRITICAL",
+      "classification": "UNKNOWN THREAT ACTOR",
+      "updated_at": "2026-03-22T19:10:20.565096"
+    },
+    "185.220.101.32": {
+      "ip": "185.220.101.32",
+      "dna_hash": "bc8403fde495088d",
+      "dna_string": "seq:WINDOWS_RANSOMWARE_BEHAVIOR_WINDOWS_RANSOMWARE_BEHAVIOR|time:AFTERNOON|speed:SLOW",
+      "first_seen": "2026-03-22T15:59:29.025659",
+      "last_seen": "2026-03-22T16:03:33.497919",
+      "total_attacks": 2,
+      "features": {
+        "attack_sequence": [
+          "WINDOWS_RANSOMWARE_BEHAVIOR",
+          "WINDOWS_RANSOMWARE_BEHAVIOR"
+        ],
+        "preferred_hours": [
+          15,
+          16
+        ],
+        "avg_hour": 15.5,
+        "avg_gap_seconds": 244.47226,
+        "min_gap_seconds": 244.47226,
+        "user_agents": [],
+        "usernames_tried": [],
+        "passwords_tried": [],
+        "unique_usernames": 0,
+        "unique_passwords": 0,
+        "honeypots_targeted": [
+          "WINDOWS_AGENT"
+        ],
+        "target_count": 1,
+        "severity_distribution": {
+          "CRITICAL": 2,
+          "HIGH": 0,
+          "MEDIUM": 0,
+          "LOW": 0
+        }
+      },
+      "severity": "CRITICAL",
+      "classification": "UNKNOWN THREAT ACTOR",
+      "updated_at": "2026-03-22T19:10:20.565349"
+    },
+    "45.95.168.119": {
+      "ip": "45.95.168.119",
+      "dna_hash": "4d72a211aab5eaa5",
+      "dna_string": "seq:WINDOWS_HONEYTOKEN_TRIGGERED_WINDOWS_HONEYTOKEN_TRIGGERED|time:AFTERNOON|speed:SLOW",
+      "first_seen": "2026-03-22T15:59:31.028170",
+      "last_seen": "2026-03-22T16:03:35.501973",
+      "total_attacks": 2,
+      "features": {
+        "attack_sequence": [
+          "WINDOWS_HONEYTOKEN_TRIGGERED",
+          "WINDOWS_HONEYTOKEN_TRIGGERED"
+        ],
+        "preferred_hours": [
+          15,
+          16
+        ],
+        "avg_hour": 15.5,
+        "avg_gap_seconds": 244.473803,
+        "min_gap_seconds": 244.473803,
+        "user_agents": [],
+        "usernames_tried": [],
+        "passwords_tried": [],
+        "unique_usernames": 0,
+        "unique_passwords": 0,
+        "honeypots_targeted": [
+          "WINDOWS_AGENT"
+        ],
+        "target_count": 1,
+        "severity_distribution": {
+          "CRITICAL": 2,
+          "HIGH": 0,
+          "MEDIUM": 0,
+          "LOW": 0
+        }
+      },
+      "severity": "CRITICAL",
+      "classification": "UNKNOWN THREAT ACTOR",
+      "updated_at": "2026-03-22T19:10:20.565413"
+    }
+  },
+  "fingerprints": {
+    "8ffacb1f61f73754": "127.0.0.1",
+    "b7694435b891c6e0": "185.220.101.47",
+    "b35cbe5d65d63aef": "45.152.66.12",
+    "46e6e5c362749179": "103.216.221.15",
+    "374f801acaf5ba65": "91.108.4.177",
+    "bc8403fde495088d": "185.220.101.32",
+    "4d72a211aab5eaa5": "45.95.168.119"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "current_os": {
+    "os": "Debian GNU/Linux 11",
+    "kernel": "5.10.0-28-amd64",
+    "ssh_banner": "SSH-2.0-OpenSSH_8.4p1 Debian-5+deb11u3"
+  },
+  "current_web": {
+    "server": "Apache/2.2.34 (Amazon)",
+    "x-powered-by": "PHP/7.4.33",
+    "framework": "WordPress"
+  },
+  "current_db": {
+    "db": "MySQL",
+    "version": "8.0.34",
+    "banner": "8.0.34-MySQL Community Server - GPL"
+  },
+  "current_hostname": "srv-79-prod",
+  "rotation_count": 1,
+  "last_rotation": "2026-03-22T19:20:48.805446"
+}

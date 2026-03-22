@@ -91,3 +91,9 @@ def start_threat_intel():
     print("[MAYA] Starting Threat Intelligence Engine...")
     from detection.threat_intelligence import run_continuous_intel
     run_continuous_intel()
+
+def start_dna_profiler():
+    time.sleep(6)
+    print("[MAYA] Starting Attacker DNA Profiling System...")
+    from detection.dna_profiler import watch_and_profile
+    watch_and_profile()
