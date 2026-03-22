@@ -6,3 +6,6 @@ venv/
 __pycache__/
 *.pyc
 *.pkl
+honeypot/decoy_files/
+logs/honeytokens.json
+logs/reports/
