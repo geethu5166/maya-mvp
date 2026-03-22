@@ -36,7 +36,9 @@ def get_stats(attacks):
         'high': high,
         'ssh': ssh,
         'web': web,
-        'unique_ips': unique_ips
+        'unique_ips': unique_ips,
+        'medium': len([a for a in attacks if a.get('severity') == 'MEDIUM']),
+        'low': len([a for a in attacks if a.get('severity') == 'LOW'])
     }
 
 def watch_log():
