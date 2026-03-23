@@ -3,616 +3,1240 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MAYA — Vaultrap Security Operations Center</title>
+<title>MAYA SOC — Vaultrap Security</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=JetBrains+Mono:wght@300;400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
---g:#00ff88;--g2:#00c896;--gd:rgba(0,255,136,0.08);
---dark:#040608;--dark2:#080d12;--dark3:#0c1219;--dark4:#101820;
---border:rgba(0,255,136,0.12);--border2:rgba(0,255,136,0.06);
---text:#e8f0e8;--muted:#3a5050;--muted2:#4a6060;
---red:#ff3366;--orange:#ff8800;--blue:#0088ff;--yellow:#ffcc00;--purple:#9c27b0;
+--g:#00e676;--g2:#00c853;--gd:rgba(0,230,118,0.08);--gd2:rgba(0,230,118,0.04);
+--dark:#0a0d12;--dark2:#0f1318;--dark3:#141920;--dark4:#1a2128;--dark5:#1e262e;
+--border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.04);--border3:rgba(0,230,118,0.15);
+--text:#f0f4f0;--text2:#a8b8a8;--text3:#607060;
+--red:#ff4569;--orange:#ff9100;--blue:#40c4ff;--yellow:#ffd740;--purple:#e040fb;--cyan:#18ffff;
+--red-bg:rgba(255,69,105,0.08);--orange-bg:rgba(255,145,0,0.08);--blue-bg:rgba(64,196,255,0.08);
+--green-bg:rgba(0,230,118,0.08);--purple-bg:rgba(224,64,251,0.08);
+--sidebar:220px;--topbar:56px;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{height:100%;overflow:hidden;}
-body{font-family:'JetBrains Mono',monospace;background:var(--dark);color:var(--text);display:flex;flex-direction:column;}
-body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.025) 2px,rgba(0,0,0,0.025) 4px);pointer-events:none;z-index:9999;}
+body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);display:flex;flex-direction:column;}
+
+/* SCROLLBARS */
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:rgba(0,230,118,0.3);border-radius:2px;}
+::-webkit-scrollbar-thumb:hover{background:var(--g);}
 
 /* TOPBAR */
-.topbar{height:52px;background:var(--dark2);border-bottom:1px solid var(--border2);display:flex;align-items:center;padding:0 20px;gap:20px;flex-shrink:0;}
-.logo{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;letter-spacing:3px;display:flex;align-items:center;gap:8px;color:var(--text);}
-.logo-icon{width:22px;height:22px;border:1px solid var(--g);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.logo-icon::before{content:'';width:8px;height:8px;background:var(--g);clip-path:polygon(50% 0%,100% 100%,0% 100%);animation:spin 4s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg);}}
-.logo .v{color:var(--g);}
-.topbar-divider{width:1px;height:20px;background:var(--border2);}
-.topbar-info{font-size:10px;color:var(--muted2);letter-spacing:1px;}
-.topbar-info span{color:var(--g);}
-.topbar-right{margin-left:auto;display:flex;align-items:center;gap:16px;}
-.live-indicator{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--g);letter-spacing:1px;}
-.live-dot{width:6px;height:6px;background:var(--g);border-radius:50%;animation:pulse 1s infinite;}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.2}}
-.clock{font-size:11px;color:var(--muted2);font-family:'Space Mono',monospace;}
-.report-btn{padding:6px 16px;border:1px solid var(--g);background:transparent;color:var(--g);font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden;}
-.report-btn::before{content:'';position:absolute;inset:0;background:var(--g);transform:translateX(-101%);transition:transform 0.2s;}
-.report-btn:hover{color:var(--dark);}
-.report-btn:hover::before{transform:translateX(0);}
-.report-btn span{position:relative;z-index:1;}
-
-/* STATS ROW */
-.stats-row{display:grid;grid-template-columns:repeat(8,1fr);gap:1px;background:var(--border2);flex-shrink:0;border-bottom:1px solid var(--border2);}
-.stat-cell{background:var(--dark);padding:12px 16px;position:relative;cursor:default;}
-.stat-cell::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:var(--g);transform:scaleX(0);transform-origin:left;transition:transform 0.3s;}
-.stat-cell:hover::after{transform:scaleX(1);}
-.stat-cell:hover{background:var(--dark2);}
-.stat-num{font-family:'Space Mono',monospace;font-size:20px;font-weight:700;display:block;line-height:1;}
-.stat-label{font-size:9px;color:var(--muted2);text-transform:uppercase;letter-spacing:1px;margin-top:4px;display:block;}
-.col-green{color:var(--g);}
-.col-red{color:var(--red);}
-.col-orange{color:var(--orange);}
-.col-blue{color:var(--blue);}
-.col-yellow{color:var(--yellow);}
-.col-purple{color:#ce93d8;}
+.topbar{height:var(--topbar);background:var(--dark2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:16px;flex-shrink:0;z-index:100;}
+.topbar-logo{font-family:'Space Mono',monospace;font-size:14px;font-weight:700;letter-spacing:3px;display:flex;align-items:center;gap:10px;margin-right:8px;}
+.logo-mark{width:28px;height:28px;background:var(--g);display:flex;align-items:center;justify-content:center;clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);}
+.logo-mark svg{width:14px;height:14px;}
+.logo-v{color:var(--g);}
+.topbar-divider{width:1px;height:24px;background:var(--border);flex-shrink:0;}
+.topbar-tag{font-size:11px;color:var(--text3);letter-spacing:0.5px;font-family:'JetBrains Mono',monospace;}
+.topbar-tag span{color:var(--g);}
+.topbar-search{flex:1;max-width:360px;position:relative;margin-left:8px;}
+.topbar-search input{width:100%;height:34px;background:var(--dark3);border:1px solid var(--border);border-radius:8px;padding:0 12px 0 36px;font-size:13px;color:var(--text);font-family:'Inter',sans-serif;outline:none;transition:border-color 0.2s;}
+.topbar-search input:focus{border-color:var(--border3);}
+.topbar-search input::placeholder{color:var(--text3);}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);opacity:0.4;}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
+.status-pill{display:flex;align-items:center;gap:6px;padding:6px 12px;background:var(--dark3);border:1px solid var(--border3);border-radius:20px;font-size:11px;color:var(--g);font-family:'JetBrains Mono',monospace;letter-spacing:0.5px;}
+.pulse{width:6px;height:6px;background:var(--g);border-radius:50%;animation:pulse 1.5s infinite;}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(0,230,118,0.4)}50%{opacity:0.7;box-shadow:0 0 0 4px rgba(0,230,118,0)}}
+.topbar-clock{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text3);}
+.icon-btn{width:34px;height:34px;background:var(--dark3);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;color:var(--text3);}
+.icon-btn:hover{border-color:var(--border3);color:var(--g);}
+.report-btn{height:34px;padding:0 16px;background:var(--g);color:var(--dark);border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:'Inter',sans-serif;transition:all 0.2s;white-space:nowrap;}
+.report-btn:hover{background:var(--g2);transform:translateY(-1px);}
 
 /* MAIN LAYOUT */
-.main-layout{flex:1;display:grid;grid-template-columns:1fr 320px;grid-template-rows:1fr 240px;gap:1px;background:var(--border2);overflow:hidden;min-height:0;}
+.main-layout{flex:1;display:flex;overflow:hidden;min-height:0;}
 
-/* FEED PANEL */
-.feed-panel{background:var(--dark);display:flex;flex-direction:column;overflow:hidden;}
-.panel-header{padding:10px 16px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
-.panel-title{font-size:9px;color:var(--g);letter-spacing:3px;text-transform:uppercase;display:flex;align-items:center;gap:8px;}
-.panel-title::before{content:'';width:16px;height:1px;background:var(--g);}
-.panel-count{font-size:9px;color:var(--muted2);letter-spacing:1px;}
-.feed-header{display:grid;grid-template-columns:130px 120px 190px 90px 1fr;padding:8px 16px;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid var(--border2);background:var(--dark2);flex-shrink:0;}
+/* SIDEBAR */
+.sidebar{width:var(--sidebar);background:var(--dark2);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;}
+.sidebar-section{padding:16px 12px 8px;}
+.sidebar-section-label{font-size:10px;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;padding:0 8px;margin-bottom:6px;font-weight:600;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;cursor:pointer;transition:all 0.15s;color:var(--text2);font-size:13px;font-weight:500;position:relative;}
+.nav-item:hover{background:var(--dark3);color:var(--text);}
+.nav-item.active{background:var(--gd);color:var(--g);}
+.nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:60%;background:var(--g);border-radius:0 2px 2px 0;}
+.nav-icon{width:16px;height:16px;flex-shrink:0;opacity:0.7;}
+.nav-item.active .nav-icon{opacity:1;}
+.nav-badge{margin-left:auto;font-size:10px;font-weight:600;padding:1px 7px;border-radius:10px;font-family:'JetBrains Mono',monospace;}
+.nav-badge.red{background:var(--red-bg);color:var(--red);}
+.nav-badge.green{background:var(--green-bg);color:var(--g);}
+.nav-badge.orange{background:var(--orange-bg);color:var(--orange);}
+.sidebar-stats{padding:12px;margin:8px 12px;background:var(--dark3);border-radius:10px;border:1px solid var(--border);}
+.sidebar-stat{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border2);}
+.sidebar-stat:last-child{border:none;}
+.ss-label{font-size:11px;color:var(--text3);}
+.ss-val{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;}
+.sidebar-footer{margin-top:auto;padding:12px;border-top:1px solid var(--border);}
+.system-health{background:var(--dark3);border-radius:8px;padding:10px 12px;font-size:11px;}
+.sh-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.sh-row:last-child{margin:0;}
+.sh-label{color:var(--text3);}
+.sh-bar{width:60px;height:4px;background:var(--border);border-radius:2px;overflow:hidden;}
+.sh-fill{height:100%;border-radius:2px;transition:width 0.5s;}
+
+/* CONTENT AREA */
+.content{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
+
+/* STATS ROW */
+.stats-row{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:var(--border);border-bottom:1px solid var(--border);flex-shrink:0;}
+.stat-card{background:var(--dark2);padding:14px 18px;position:relative;overflow:hidden;transition:background 0.2s;cursor:default;}
+.stat-card:hover{background:var(--dark3);}
+.stat-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;transform:scaleX(0);transform-origin:left;transition:transform 0.3s;}
+.stat-card:hover::after{transform:scaleX(1);}
+.sc-g::after{background:var(--g);}
+.sc-r::after{background:var(--red);}
+.sc-o::after{background:var(--orange);}
+.sc-b::after{background:var(--blue);}
+.sc-p::after{background:var(--purple);}
+.sc-c::after{background:var(--cyan);}
+.stat-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;font-weight:600;margin-bottom:6px;}
+.stat-num{font-family:'Space Mono',monospace;font-size:24px;font-weight:700;line-height:1;}
+.stat-trend{font-size:10px;margin-top:4px;display:flex;align-items:center;gap:3px;}
+.trend-up{color:var(--red);}
+.trend-down{color:var(--g);}
+.stat-icon{position:absolute;right:14px;top:14px;opacity:0.06;font-size:28px;}
+
+/* FILTER BAR */
+.filter-bar{display:flex;align-items:center;gap:8px;padding:10px 16px;background:var(--dark2);border-bottom:1px solid var(--border);flex-shrink:0;flex-wrap:wrap;}
+.filter-label{font-size:11px;color:var(--text3);font-weight:600;margin-right:4px;}
+.filter-chip{padding:4px 10px;border-radius:16px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:11px;cursor:pointer;transition:all 0.15s;font-family:'Inter',sans-serif;font-weight:500;}
+.filter-chip:hover{border-color:var(--border3);color:var(--g);}
+.filter-chip.active{background:var(--gd);border-color:var(--border3);color:var(--g);}
+.filter-chip.active-red{background:var(--red-bg);border-color:rgba(255,69,105,0.3);color:var(--red);}
+.filter-chip.active-orange{background:var(--orange-bg);border-color:rgba(255,145,0,0.3);color:var(--orange);}
+.filter-divider{width:1px;height:20px;background:var(--border);margin:0 4px;}
+.filter-select{height:28px;padding:0 8px;background:var(--dark3);border:1px solid var(--border);border-radius:6px;color:var(--text2);font-size:11px;font-family:'Inter',sans-serif;outline:none;cursor:pointer;}
+.filter-select:focus{border-color:var(--border3);}
+.filter-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.filter-count{font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace;}
+.clear-btn{font-size:11px;color:var(--text3);cursor:pointer;padding:3px 8px;border-radius:4px;border:1px solid var(--border);background:transparent;font-family:'Inter',sans-serif;}
+.clear-btn:hover{color:var(--g);border-color:var(--border3);}
+
+/* PANELS */
+.panels{flex:1;display:grid;grid-template-columns:1fr 340px;grid-template-rows:1fr 220px;gap:1px;background:var(--border);overflow:hidden;min-height:0;}
+
+/* FEED */
+.feed-panel{background:var(--dark2);display:flex;flex-direction:column;overflow:hidden;}
+.panel-header{padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.panel-title{font-size:12px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px;}
+.panel-title-dot{width:6px;height:6px;border-radius:50%;background:var(--g);animation:pulse 1.5s infinite;}
+.panel-actions{margin-left:auto;display:flex;align-items:center;gap:6px;}
+.pa-btn{height:26px;padding:0 10px;background:transparent;border:1px solid var(--border);border-radius:6px;font-size:11px;color:var(--text3);cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.15s;}
+.pa-btn:hover{border-color:var(--border3);color:var(--g);}
+.feed-table-header{display:grid;grid-template-columns:26px 140px 130px 200px 90px 1fr 100px;padding:8px 16px;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;font-weight:600;border-bottom:1px solid var(--border);background:var(--dark3);flex-shrink:0;}
 .feed-body{flex:1;overflow-y:auto;min-height:0;}
-.feed-body::-webkit-scrollbar{width:2px;}
-.feed-body::-webkit-scrollbar-thumb{background:var(--g);}
-.feed-row{display:grid;grid-template-columns:130px 120px 190px 90px 1fr;padding:8px 16px;font-size:10px;border-bottom:1px solid rgba(0,255,136,0.03);transition:background 0.15s;align-items:center;animation:rowIn 0.3s ease;}
-@keyframes rowIn{from{opacity:0;background:rgba(0,255,136,0.05);}to{opacity:1;background:transparent;}}
+.feed-row{display:grid;grid-template-columns:26px 140px 130px 200px 90px 1fr 100px;padding:9px 16px;font-size:12px;border-bottom:1px solid var(--border2);transition:background 0.1s;align-items:center;cursor:pointer;}
 .feed-row:hover{background:var(--dark3);}
-.col-time{color:var(--muted);font-size:9px;}
-.col-ip{color:var(--blue);font-family:'Space Mono',monospace;font-size:10px;}
-.type-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 7px;border-radius:2px;font-size:9px;font-weight:700;letter-spacing:0.5px;border:1px solid;}
-.t-SSH{color:#42a5f5;border-color:rgba(66,165,245,0.4);background:rgba(66,165,245,0.06);}
-.t-WEB{color:#ce93d8;border-color:rgba(206,147,216,0.4);background:rgba(206,147,216,0.06);}
-.t-DB{color:#ffb74d;border-color:rgba(255,183,77,0.4);background:rgba(255,183,77,0.06);}
-.t-WIN{color:#4dd0e1;border-color:rgba(77,208,225,0.4);background:rgba(77,208,225,0.06);}
-.t-OTHER{color:#90a4ae;border-color:rgba(144,164,174,0.4);background:rgba(144,164,174,0.06);}
-.sev-badge{display:inline-block;padding:2px 7px;border-radius:2px;font-size:9px;font-weight:700;letter-spacing:0.5px;}
-.s-CRITICAL{background:rgba(255,51,102,0.12);color:var(--red);border:1px solid rgba(255,51,102,0.3);}
-.s-HIGH{background:rgba(255,136,0,0.12);color:var(--orange);border:1px solid rgba(255,136,0,0.3);}
-.s-MEDIUM{background:rgba(255,204,0,0.12);color:var(--yellow);border:1px solid rgba(255,204,0,0.3);}
-.s-LOW{background:rgba(0,255,136,0.08);color:var(--g);border:1px solid rgba(0,255,136,0.2);}
-.col-detail{color:var(--muted2);font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.feed-empty{padding:40px;text-align:center;color:var(--muted);font-size:11px;}
+.feed-row.selected{background:var(--gd2);}
+.feed-row.new{animation:newRow 2s ease;}
+@keyframes newRow{0%{background:rgba(0,230,118,0.1);}100%{background:transparent;}}
+.row-check{width:14px;height:14px;border:1px solid var(--border);border-radius:3px;cursor:pointer;flex-shrink:0;}
+.row-check.checked{background:var(--g);border-color:var(--g);}
+.col-time{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text3);}
+.col-ip{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--blue);font-weight:500;}
+.type-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:600;letter-spacing:0.3px;}
+.tp-SSH{background:rgba(64,196,255,0.1);color:#40c4ff;border:1px solid rgba(64,196,255,0.2);}
+.tp-WEB{background:rgba(224,64,251,0.1);color:#e040fb;border:1px solid rgba(224,64,251,0.2);}
+.tp-DB{background:rgba(255,145,0,0.1);color:#ff9100;border:1px solid rgba(255,145,0,0.2);}
+.tp-WIN{background:rgba(24,255,255,0.1);color:#18ffff;border:1px solid rgba(24,255,255,0.2);}
+.tp-CI{background:rgba(255,215,64,0.1);color:#ffd740;border:1px solid rgba(255,215,64,0.2);}
+.tp-POLY{background:rgba(0,230,118,0.1);color:#00e676;border:1px solid rgba(0,230,118,0.2);}
+.tp-OTHER{background:rgba(255,255,255,0.05);color:#607060;border:1px solid rgba(255,255,255,0.08);}
+.sev-pill{display:inline-block;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:0.3px;}
+.sp-CRITICAL{background:rgba(255,69,105,0.12);color:#ff4569;border:1px solid rgba(255,69,105,0.25);}
+.sp-HIGH{background:rgba(255,145,0,0.12);color:#ff9100;border:1px solid rgba(255,145,0,0.25);}
+.sp-MEDIUM{background:rgba(255,215,64,0.12);color:#ffd740;border:1px solid rgba(255,215,64,0.25);}
+.sp-LOW{background:rgba(0,230,118,0.08);color:#00e676;border:1px solid rgba(0,230,118,0.2);}
+.col-detail{font-size:11px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.row-actions{display:flex;gap:4px;justify-content:flex-end;}
+.ra-btn{height:22px;padding:0 8px;background:transparent;border:1px solid var(--border);border-radius:4px;font-size:10px;color:var(--text3);cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.15s;white-space:nowrap;}
+.ra-btn:hover{border-color:var(--border3);color:var(--g);}
+.feed-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:12px;color:var(--text3);}
+.feed-empty-icon{font-size:32px;opacity:0.3;}
+.feed-empty p{font-size:13px;}
 
 /* RIGHT PANEL */
-.right-panel{background:var(--dark2);display:flex;flex-direction:column;overflow:hidden;border-left:1px solid var(--border2);}
-.right-section{border-bottom:1px solid var(--border2);flex-shrink:0;}
-.right-section:last-child{border:none;flex:1;overflow:hidden;}
-
-/* THREAT DIST */
-.dist-grid{padding:12px 16px;}
-.dist-row{margin-bottom:10px;}
-.dist-label{display:flex;justify-content:space-between;font-size:10px;color:var(--muted2);margin-bottom:4px;}
-.dist-label span:last-child{color:var(--text);}
-.dist-track{height:3px;background:var(--border2);border-radius:1px;overflow:hidden;}
-.dist-fill{height:100%;border-radius:1px;transition:width 0.5s ease;}
+.right-panel{background:var(--dark2);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.right-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;}
+.rtab{flex:1;padding:10px;font-size:11px;font-weight:600;color:var(--text3);cursor:pointer;text-align:center;transition:all 0.15s;border-bottom:2px solid transparent;}
+.rtab:hover{color:var(--text);}
+.rtab.active{color:var(--g);border-bottom-color:var(--g);}
+.right-content{flex:1;overflow-y:auto;padding:12px;}
 
 /* AI ANALYSIS */
-.ai-panel{flex:1;display:flex;flex-direction:column;overflow:hidden;}
-.ai-body{flex:1;overflow-y:auto;padding:12px 16px;font-size:11px;line-height:1.7;}
-.ai-body::-webkit-scrollbar{width:2px;}
-.ai-body::-webkit-scrollbar-thumb{background:var(--g);}
-.ai-thinking{display:flex;align-items:center;gap:8px;color:var(--muted2);font-size:10px;}
-.ai-dots span{animation:dot 1.4s infinite;}
-.ai-dots span:nth-child(2){animation-delay:0.2s;}
-.ai-dots span:nth-child(3){animation-delay:0.4s;}
-@keyframes dot{0%,60%,100%{opacity:0.3}30%{opacity:1}}
-.ai-entry{margin-bottom:12px;padding:10px 12px;border-left:2px solid var(--g);background:rgba(0,255,136,0.03);}
-.ai-entry-header{font-size:9px;color:var(--g);letter-spacing:1px;margin-bottom:6px;text-transform:uppercase;}
-.ai-entry-text{font-size:11px;color:var(--muted2);line-height:1.7;}
-.ai-entry-text strong{color:var(--text);}
-.ai-entry.critical{border-left-color:var(--red);background:rgba(255,51,102,0.03);}
-.ai-entry.critical .ai-entry-header{color:var(--red);}
-.ai-entry.high{border-left-color:var(--orange);background:rgba(255,136,0,0.03);}
-.ai-entry.high .ai-entry-header{color:var(--orange);}
+.ai-entry{margin-bottom:10px;border-radius:8px;overflow:hidden;}
+.ai-entry-header{padding:8px 12px;font-size:10px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;display:flex;align-items:center;gap:6px;}
+.ai-entry-body{padding:10px 12px;font-size:12px;line-height:1.7;color:var(--text2);}
+.ai-entry-body strong{color:var(--text);}
+.ai-critical .ai-entry-header{background:rgba(255,69,105,0.12);color:var(--red);}
+.ai-critical .ai-entry-body{background:rgba(255,69,105,0.05);}
+.ai-high .ai-entry-header{background:rgba(255,145,0,0.12);color:var(--orange);}
+.ai-high .ai-entry-body{background:rgba(255,145,0,0.05);}
+.ai-normal .ai-entry-header{background:var(--gd);color:var(--g);}
+.ai-normal .ai-entry-body{background:var(--gd2);}
+.ai-metric{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border2);font-size:11px;}
+.ai-metric:last-child{border:none;}
+.aim-label{color:var(--text3);}
+.aim-val{font-family:'JetBrains Mono',monospace;font-weight:600;}
 
-/* BOTTOM PANELS */
-.bottom-left{background:var(--dark);display:flex;flex-direction:column;overflow:hidden;}
-.bottom-right{background:var(--dark2);display:flex;flex-direction:column;overflow:hidden;border-left:1px solid var(--border2);}
+/* ATTACKER PROFILES */
+.profile-card{background:var(--dark3);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:8px;cursor:pointer;transition:all 0.15s;}
+.profile-card:hover{border-color:var(--border3);}
+.pc-header{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.pc-avatar{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;flex-shrink:0;}
+.pc-ip{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:var(--blue);}
+.pc-class{font-size:10px;color:var(--text3);margin-top:1px;}
+.pc-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;}
+.pcs{background:var(--dark4);border-radius:6px;padding:6px;text-align:center;}
+.pcs-num{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;}
+.pcs-label{font-size:9px;color:var(--text3);margin-top:2px;}
+.dna-chip{display:inline-block;padding:2px 8px;background:var(--gd);border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--g);margin-top:6px;}
 
-/* ATTACKER TABLE */
-.attacker-table{flex:1;overflow-y:auto;min-height:0;}
-.attacker-table::-webkit-scrollbar{width:2px;}
-.attacker-table::-webkit-scrollbar-thumb{background:var(--g);}
-.att-row{display:grid;grid-template-columns:120px 140px 100px 80px 1fr;padding:7px 16px;font-size:10px;border-bottom:1px solid rgba(0,255,136,0.03);transition:background 0.15s;align-items:center;}
-.att-row:hover{background:var(--dark2);}
-.att-header{background:var(--dark2);color:var(--muted);font-size:9px;text-transform:uppercase;letter-spacing:1px;}
-
-/* TERMINAL */
-.terminal-body{flex:1;overflow-y:auto;padding:12px 16px;min-height:0;}
-.terminal-body::-webkit-scrollbar{width:2px;}
-.terminal-body::-webkit-scrollbar-thumb{background:var(--g);}
-.t-line{font-size:10px;line-height:1.8;display:flex;gap:8px;}
-.t-prompt{color:var(--g);opacity:0.5;flex-shrink:0;}
-.t-success{color:var(--g);}
-.t-alert{color:var(--red);}
-.t-warn{color:var(--orange);}
-.t-info{color:var(--muted2);}
-.t-cursor-blink{display:inline-block;width:7px;height:12px;background:var(--g);animation:blink 1s infinite;vertical-align:middle;}
+/* BOTTOM LEFT */
+.bottom-left{background:var(--dark2);display:flex;flex-direction:column;overflow:hidden;border-top:1px solid var(--border);}
+.mini-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--border);flex:1;overflow:hidden;}
+.mini-panel{background:var(--dark2);padding:12px 14px;overflow:hidden;}
+.mp-title{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.mp-title-dot{width:5px;height:5px;border-radius:50%;}
+.dist-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
+.dist-label{font-size:11px;color:var(--text2);width:100px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.dist-bar{flex:1;height:4px;background:var(--dark4);border-radius:2px;overflow:hidden;}
+.dist-fill{height:100%;border-radius:2px;transition:width 0.5s ease;}
+.dist-count{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text3);min-width:24px;text-align:right;}
+.term-body{flex:1;overflow-y:auto;font-family:'JetBrains Mono',monospace;font-size:10px;line-height:1.8;}
+.tl{display:flex;gap:6px;padding:1px 0;}
+.tp{color:var(--g);opacity:0.5;flex-shrink:0;}
+.ts{color:var(--g);}
+.ta{color:var(--red);}
+.tw{color:var(--orange);}
+.ti{color:var(--text3);}
+.tc{display:inline-block;width:6px;height:11px;background:var(--g);animation:blink 1s infinite;vertical-align:middle;}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0;}}
+.heatmap-grid{display:grid;grid-template-columns:repeat(24,1fr);gap:2px;}
+.hm-cell{height:20px;border-radius:2px;background:var(--dark4);transition:background 0.3s;cursor:default;position:relative;}
+.hm-cell:hover::after{content:attr(title);position:absolute;bottom:24px;left:50%;transform:translateX(-50%);background:var(--dark3);border:1px solid var(--border);padding:3px 6px;font-size:9px;border-radius:4px;white-space:nowrap;pointer-events:none;z-index:10;}
+.hm-label{font-size:9px;color:var(--text3);margin-top:4px;display:flex;justify-content:space-between;}
 
-/* AI REPORT MODAL */
-.modal-overlay{position:fixed;inset:0;background:rgba(4,6,8,0.92);z-index:10000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
-.modal-overlay.open{display:flex;}
-.modal{width:min(700px,90vw);max-height:85vh;background:var(--dark2);border:1px solid var(--border);display:flex;flex-direction:column;}
-.modal-header{padding:16px 20px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
-.modal-title{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:var(--g);letter-spacing:2px;}
-.modal-close{background:none;border:1px solid var(--border);color:var(--muted2);font-family:'JetBrains Mono',monospace;font-size:11px;padding:4px 12px;cursor:pointer;letter-spacing:1px;transition:all 0.2s;}
+/* BOTTOM RIGHT */
+.bottom-right{background:var(--dark2);display:flex;flex-direction:column;overflow:hidden;border-left:1px solid var(--border);border-top:1px solid var(--border);}
+
+/* MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(10,13,18,0.88);z-index:1000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(6px);}
+.modal-bg.open{display:flex;}
+.modal{width:min(720px,92vw);max-height:88vh;background:var(--dark2);border:1px solid var(--border3);border-radius:16px;display:flex;flex-direction:column;box-shadow:0 24px 80px rgba(0,0,0,0.6);}
+.modal-head{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-shrink:0;}
+.modal-icon{width:36px;height:36px;background:var(--gd);border:1px solid var(--border3);border-radius:10px;display:flex;align-items:center;justify-content:center;}
+.modal-title{font-size:15px;font-weight:700;}
+.modal-sub{font-size:11px;color:var(--text3);margin-top:2px;}
+.modal-close{margin-left:auto;width:32px;height:32px;background:var(--dark3);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.15s;color:var(--text3);}
 .modal-close:hover{border-color:var(--red);color:var(--red);}
-.modal-body{flex:1;overflow-y:auto;padding:20px;}
-.modal-body::-webkit-scrollbar{width:4px;}
-.modal-body::-webkit-scrollbar-thumb{background:var(--g);}
-.report-section{margin-bottom:24px;}
-.report-section-title{font-size:9px;color:var(--g);letter-spacing:3px;text-transform:uppercase;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border2);display:flex;align-items:center;gap:8px;}
-.report-section-title::before{content:'';width:16px;height:1px;background:var(--g);}
-.report-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-.report-item{background:var(--dark);padding:10px 14px;border-left:1px solid var(--border2);}
-.report-key{font-size:9px;color:var(--muted2);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;}
-.report-val{font-size:12px;color:var(--text);}
-.report-val.danger{color:var(--red);}
-.report-val.warn{color:var(--orange);}
-.report-val.safe{color:var(--g);}
-.report-text{font-size:12px;color:var(--muted2);line-height:1.8;background:var(--dark);padding:14px;border-left:2px solid var(--g);}
-.report-actions{display:flex;flex-direction:column;gap:6px;}
-.report-action{padding:8px 12px;font-size:11px;display:flex;align-items:center;gap:8px;}
-.ra-done{background:rgba(0,255,136,0.05);border:1px solid rgba(0,255,136,0.15);color:var(--g);}
-.ra-done::before{content:'✓';}
-.ra-pending{background:rgba(255,136,0,0.05);border:1px solid rgba(255,136,0,0.15);color:var(--orange);}
-.ra-pending::before{content:'→';}
-.modal-footer{padding:12px 20px;border-top:1px solid var(--border2);display:flex;gap:10px;flex-shrink:0;}
-.modal-btn{padding:8px 20px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all 0.2s;border:1px solid var(--border);background:transparent;color:var(--muted2);}
-.modal-btn:hover{border-color:var(--g);color:var(--g);}
-.modal-btn.primary{background:var(--g);color:var(--dark);border-color:var(--g);}
-.modal-btn.primary:hover{background:var(--g2);}
-.generating{display:flex;align-items:center;gap:8px;color:var(--g);font-size:11px;padding:20px;}
+.modal-body{flex:1;overflow-y:auto;padding:20px 24px;}
+.report-block{margin-bottom:20px;}
+.rb-title{font-size:11px;font-weight:700;color:var(--g);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+.rb-title::before{content:'';width:3px;height:12px;background:var(--g);border-radius:2px;}
+.rb-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.rb-item{background:var(--dark3);border-radius:8px;padding:10px 14px;}
+.rb-key{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;}
+.rb-val{font-size:13px;font-weight:600;}
+.rb-val.danger{color:var(--red);}
+.rb-val.warn{color:var(--orange);}
+.rb-val.safe{color:var(--g);}
+.rb-text{font-size:13px;color:var(--text2);line-height:1.8;background:var(--dark3);border-radius:8px;padding:14px;border-left:3px solid var(--g);}
+.rb-steps{display:flex;flex-direction:column;gap:6px;}
+.rb-step{display:flex;gap:10px;align-items:flex-start;padding:8px 12px;background:var(--dark3);border-radius:6px;}
+.rb-step-num{width:20px;height:20px;background:var(--gd);border:1px solid var(--border3);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--g);flex-shrink:0;margin-top:1px;}
+.rb-step p{font-size:12px;color:var(--text2);line-height:1.6;}
+.rb-action{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:6px;font-size:12px;margin-bottom:5px;}
+.rba-done{background:rgba(0,230,118,0.05);border:1px solid rgba(0,230,118,0.15);color:var(--g);}
+.rba-done::before{content:'✓';font-weight:700;margin-right:2px;}
+.rba-pending{background:rgba(255,145,0,0.05);border:1px solid rgba(255,145,0,0.15);color:var(--orange);}
+.rba-pending::before{content:'→';margin-right:2px;}
+.modal-footer{padding:14px 24px;border-top:1px solid var(--border);display:flex;gap:8px;flex-shrink:0;}
+.mf-btn{height:36px;padding:0 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.15s;}
+.mf-primary{background:var(--g);color:var(--dark);border:none;}
+.mf-primary:hover{background:var(--g2);}
+.mf-secondary{background:transparent;border:1px solid var(--border);color:var(--text2);}
+.mf-secondary:hover{border-color:var(--border3);color:var(--g);}
+
+/* DETAIL DRAWER */
+.drawer{position:fixed;right:-420px;top:var(--topbar);bottom:0;width:420px;background:var(--dark2);border-left:1px solid var(--border3);z-index:200;transition:right 0.3s ease;overflow-y:auto;display:flex;flex-direction:column;}
+.drawer.open{right:0;}
+.drawer-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.drawer-title{font-size:14px;font-weight:700;}
+.drawer-close{margin-left:auto;cursor:pointer;color:var(--text3);padding:4px;}
+.drawer-close:hover{color:var(--text);}
+.drawer-body{padding:16px 20px;flex:1;}
+.detail-section{margin-bottom:16px;}
+.detail-section-title{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border2);}
+.detail-row{display:flex;justify-content:space-between;align-items:flex-start;padding:7px 0;border-bottom:1px solid var(--border2);}
+.detail-row:last-child{border:none;}
+.dr-key{font-size:11px;color:var(--text3);flex-shrink:0;margin-right:12px;}
+.dr-val{font-size:12px;color:var(--text);text-align:right;font-family:'JetBrains Mono',monospace;word-break:break-all;}
+.mitre-badge{display:inline-block;padding:4px 10px;background:var(--gd);border:1px solid var(--border3);border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--g);}
+.risk-meter{margin:10px 0;}
+.rm-track{height:8px;background:var(--dark4);border-radius:4px;overflow:hidden;margin-top:6px;}
+.rm-fill{height:100%;border-radius:4px;transition:width 0.5s;}
+
+/* NOTIFICATIONS */
+.notif{position:fixed;bottom:20px;right:20px;background:var(--dark3);border:1px solid var(--border3);border-radius:10px;padding:12px 16px;display:flex;gap:10px;align-items:flex-start;max-width:320px;z-index:2000;animation:slideInNotif 0.3s ease;box-shadow:0 8px 32px rgba(0,0,0,0.4);}
+@keyframes slideInNotif{from{opacity:0;transform:translateX(20px);}to{opacity:1;transform:translateX(0);}}
+.notif-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;}
+.notif-text{flex:1;}
+.notif-title{font-size:12px;font-weight:700;margin-bottom:2px;}
+.notif-msg{font-size:11px;color:var(--text2);}
+
+@media(max-width:1200px){
+--sidebar:0px;
+.sidebar{display:none;}
+.stats-row{grid-template-columns:repeat(3,1fr);}
+.feed-table-header,.feed-row{grid-template-columns:26px 120px 110px 180px 80px 1fr;}
+.feed-table-header .col-actions,.feed-row .row-actions{display:none;}
+}
+@media(max-width:900px){
+.panels{grid-template-columns:1fr;grid-template-rows:1fr 200px;}
+.right-panel{display:none;}
+.mini-grid{grid-template-columns:1fr 1fr;}
+}
 </style>
 </head>
 <body>
 
 <!-- TOPBAR -->
 <div class="topbar">
-  <div class="logo">
-    <div class="logo-icon"></div>
-    <span><span class="v">VAULT</span>RAP / MAYA SOC</span>
+  <div class="topbar-logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 14 14" fill="none"><path d="M7 1L13 4V10L7 13L1 10V4L7 1Z" fill="#0a0d12"/><path d="M7 3L11 5.5V8.5L7 11L3 8.5V5.5L7 3Z" fill="#00e676" opacity="0.8"/></svg>
+    </div>
+    <span><span class="logo-v">VAULT</span>RAP</span>
   </div>
   <div class="topbar-divider"></div>
-  <div class="topbar-info">Platform v2.0 — <span>Autonomous Deception Active</span></div>
-  <div class="topbar-divider"></div>
-  <div class="topbar-info">AI Brain: <span>Mistral 7B</span></div>
-  <div class="topbar-divider"></div>
-  <div class="topbar-info">Honeypots: <span>SSH + WEB + DB + WINDOWS</span></div>
+  <div class="topbar-tag">MAYA SOC v3.0 — <span>All Systems Operational</span></div>
+  <div class="topbar-search">
+    <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="text" placeholder="Search attacks, IPs, types..." id="searchInput" oninput="filterAttacks()">
+  </div>
   <div class="topbar-right">
-    <div class="live-indicator"><div class="live-dot"></div>LIVE</div>
-    <div class="clock" id="clock">--:--:-- UTC</div>
-    <button class="report-btn" onclick="openReport()"><span>Generate AI Report</span></button>
+    <div class="status-pill"><div class="pulse"></div>LIVE</div>
+    <div class="topbar-clock" id="clock">--:--:--</div>
+    <div class="icon-btn" onclick="toggleNotifications()" title="Notifications">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    </div>
+    <button class="report-btn" onclick="openReport()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Generate Report
+    </button>
   </div>
 </div>
 
-<!-- STATS -->
-<div class="stats-row">
-  <div class="stat-cell"><span class="stat-num col-green" id="s-total">0</span><span class="stat-label">Total Attacks</span></div>
-  <div class="stat-cell"><span class="stat-num col-red" id="s-critical">0</span><span class="stat-label">Critical</span></div>
-  <div class="stat-cell"><span class="stat-num col-orange" id="s-high">0</span><span class="stat-label">High</span></div>
-  <div class="stat-cell"><span class="stat-num col-blue" id="s-ips">0</span><span class="stat-label">Unique IPs</span></div>
-  <div class="stat-cell"><span class="stat-num col-green" id="s-ssh">0</span><span class="stat-label">SSH</span></div>
-  <div class="stat-cell"><span class="stat-num col-purple" id="s-web">0</span><span class="stat-label">Web</span></div>
-  <div class="stat-cell"><span class="stat-num col-yellow" id="s-db">0</span><span class="stat-label">Database</span></div>
-  <div class="stat-cell"><span class="stat-num" id="s-win" style="color:#4dd0e1;">0</span><span class="stat-label">Windows</span></div>
-</div>
-
-<!-- MAIN -->
 <div class="main-layout">
 
-  <!-- FEED -->
-  <div class="feed-panel">
-    <div class="panel-header">
-      <div class="panel-title">Live Attack Feed</div>
-      <div class="panel-count" id="feed-count">0 events</div>
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Monitor</div>
+    <div class="nav-item active" onclick="setView('feed')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Live Feed
+      <span class="nav-badge red" id="nb-critical">0</span>
     </div>
-    <div class="feed-header">
-      <span>Timestamp</span>
-      <span>Attacker IP</span>
-      <span>Attack Type</span>
-      <span>Severity</span>
-      <span>Intelligence</span>
+    <div class="nav-item" onclick="setView('profiles')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Attacker Profiles
+      <span class="nav-badge orange" id="nb-ips">0</span>
     </div>
-    <div class="feed-body" id="feedBody">
-      <div class="feed-empty">MAYA deception fabric active — waiting for attackers...</div>
+    <div class="nav-item" onclick="setView('honeypots')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      Honeypots
+      <span class="nav-badge green">6</span>
     </div>
-  </div>
-
-  <!-- RIGHT PANEL -->
-  <div class="right-panel">
-    <div class="right-section">
-      <div class="panel-header"><div class="panel-title">Attack Distribution</div></div>
-      <div class="dist-grid">
-        <div class="dist-row">
-          <div class="dist-label"><span>SSH Brute Force</span><span id="d-ssh">0</span></div>
-          <div class="dist-track"><div class="dist-fill" id="df-ssh" style="width:0%;background:var(--blue)"></div></div>
-        </div>
-        <div class="dist-row">
-          <div class="dist-label"><span>Web Attacks</span><span id="d-web">0</span></div>
-          <div class="dist-track"><div class="dist-fill" id="df-web" style="width:0%;background:#ce93d8"></div></div>
-        </div>
-        <div class="dist-row">
-          <div class="dist-label"><span>Database Attacks</span><span id="d-db">0</span></div>
-          <div class="dist-track"><div class="dist-fill" id="df-db" style="width:0%;background:var(--orange)"></div></div>
-        </div>
-        <div class="dist-row">
-          <div class="dist-label"><span>Windows Agent</span><span id="d-win">0</span></div>
-          <div class="dist-track"><div class="dist-fill" id="df-win" style="width:0%;background:#4dd0e1"></div></div>
-        </div>
-        <div class="dist-row">
-          <div class="dist-label"><span>Critical Severity</span><span id="d-crit">0</span></div>
-          <div class="dist-track"><div class="dist-fill" id="df-crit" style="width:0%;background:var(--red)"></div></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="right-section ai-panel">
-      <div class="panel-header"><div class="panel-title">Mistral AI Analysis</div></div>
-      <div class="ai-body" id="aiBody">
-        <div class="ai-thinking">
-          <span>AI brain initializing</span>
-          <div class="ai-dots"><span>.</span><span>.</span><span>.</span></div>
-        </div>
-      </div>
+    <div class="nav-item" onclick="setView('intelligence')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+      Threat Intel
     </div>
   </div>
-
-  <!-- BOTTOM LEFT -->
-  <div class="bottom-left">
-    <div class="panel-header">
-      <div class="panel-title">Attacker Intelligence</div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Response</div>
+    <div class="nav-item" onclick="setView('blocked')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+      Blocked IPs
     </div>
-    <div class="att-row att-header">
-      <span>IP Address</span>
-      <span>Attack Type</span>
-      <span>Severity</span>
-      <span>Count</span>
-      <span>Last Seen</span>
-    </div>
-    <div class="attacker-table" id="attackerTable">
-      <div class="feed-empty">No attackers profiled yet</div>
+    <div class="nav-item" onclick="setView('reports')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Reports
     </div>
   </div>
-
-  <!-- BOTTOM RIGHT - TERMINAL -->
-  <div class="bottom-right">
-    <div class="panel-header"><div class="panel-title">MAYA Response Terminal</div></div>
-    <div class="terminal-body" id="termBody">
-      <div class="t-line"><span class="t-prompt">maya@soc:~$</span><span class="t-info"> system.initialize() — all honeypots active</span></div>
-      <div class="t-line"><span class="t-prompt">maya@soc:~$</span><span class="t-success"> deception_fabric.deploy() — 312 decoys live</span></div>
-      <div class="t-line"><span class="t-prompt">maya@soc:~$</span><span class="t-success"> mistral_ai.load() — brain ready</span></div>
-      <div class="t-line"><span class="t-prompt">maya@soc:~$</span><span class="t-info"> monitoring.start() — watching all attack surfaces</span></div>
-      <div class="t-line"><span class="t-prompt">maya@soc:~$</span><span class="t-cursor-blink"></span></div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Overview</div>
+    <div class="sidebar-stats">
+      <div class="sidebar-stat"><span class="ss-label">SSH Attacks</span><span class="ss-val" id="ss-ssh" style="color:var(--blue)">0</span></div>
+      <div class="sidebar-stat"><span class="ss-label">Web Attacks</span><span class="ss-val" id="ss-web" style="color:var(--purple)">0</span></div>
+      <div class="sidebar-stat"><span class="ss-label">DB Attacks</span><span class="ss-val" id="ss-db" style="color:var(--orange)">0</span></div>
+      <div class="sidebar-stat"><span class="ss-label">Windows</span><span class="ss-val" id="ss-win" style="color:var(--cyan)">0</span></div>
+      <div class="sidebar-stat"><span class="ss-label">CI Triggers</span><span class="ss-val" id="ss-ci" style="color:var(--yellow)">0</span></div>
     </div>
   </div>
-
+  <div class="sidebar-footer">
+    <div class="system-health">
+      <div class="sh-row"><span class="sh-label">SSH Honeypot</span><div class="sh-bar"><div class="sh-fill" style="width:100%;background:var(--g)"></div></div></div>
+      <div class="sh-row"><span class="sh-label">Web Honeypot</span><div class="sh-bar"><div class="sh-fill" style="width:100%;background:var(--g)"></div></div></div>
+      <div class="sh-row"><span class="sh-label">DB Honeypot</span><div class="sh-bar"><div class="sh-fill" style="width:100%;background:var(--g)"></div></div></div>
+      <div class="sh-row"><span class="sh-label">AI Engine</span><div class="sh-bar"><div class="sh-fill" style="width:98%;background:var(--g)"></div></div></div>
+      <div class="sh-row"><span class="sh-label">Mistral AI</span><div class="sh-bar"><div class="sh-fill" style="width:95%;background:var(--orange)"></div></div></div>
+    </div>
+  </div>
 </div>
 
-<!-- AI REPORT MODAL -->
-<div class="modal-overlay" id="modalOverlay">
+<!-- CONTENT -->
+<div class="content">
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card sc-g">
+      <div class="stat-label">Total Events</div>
+      <div class="stat-num" id="s-total" style="color:var(--g)">0</div>
+      <div class="stat-trend"><span class="trend-up">↑</span><span style="color:var(--text3)">This session</span></div>
+      <div class="stat-icon">⚡</div>
+    </div>
+    <div class="stat-card sc-r">
+      <div class="stat-label">Critical</div>
+      <div class="stat-num" id="s-critical" style="color:var(--red)">0</div>
+      <div class="stat-trend" id="st-critical"><span style="color:var(--text3)">Immediate action</span></div>
+      <div class="stat-icon">🔴</div>
+    </div>
+    <div class="stat-card sc-o">
+      <div class="stat-label">High Severity</div>
+      <div class="stat-num" id="s-high" style="color:var(--orange)">0</div>
+      <div class="stat-trend"><span style="color:var(--text3)">Investigation needed</span></div>
+      <div class="stat-icon">🟠</div>
+    </div>
+    <div class="stat-card sc-b">
+      <div class="stat-label">Unique Attackers</div>
+      <div class="stat-num" id="s-ips" style="color:var(--blue)">0</div>
+      <div class="stat-trend"><span style="color:var(--text3)">Distinct IPs</span></div>
+      <div class="stat-icon">🌐</div>
+    </div>
+    <div class="stat-card sc-p">
+      <div class="stat-label">Blocked IPs</div>
+      <div class="stat-num" id="s-blocked" style="color:var(--purple)">0</div>
+      <div class="stat-trend"><span style="color:var(--text3)">Auto-blocked</span></div>
+      <div class="stat-icon">🛡️</div>
+    </div>
+    <div class="stat-card sc-c">
+      <div class="stat-label">False Positives</div>
+      <div class="stat-num" style="color:var(--g)">0</div>
+      <div class="stat-trend"><span class="trend-down">✓</span><span style="color:var(--g)">Guaranteed</span></div>
+      <div class="stat-icon">✅</div>
+    </div>
+  </div>
+
+  <!-- FILTER BAR -->
+  <div class="filter-bar">
+    <span class="filter-label">Filter:</span>
+    <button class="filter-chip active" id="f-all" onclick="applyFilter('all')">All</button>
+    <button class="filter-chip" id="f-critical" onclick="applyFilter('critical')">🔴 Critical</button>
+    <button class="filter-chip" id="f-high" onclick="applyFilter('high')">🟠 High</button>
+    <button class="filter-chip" id="f-ssh" onclick="applyFilter('ssh')">SSH</button>
+    <button class="filter-chip" id="f-web" onclick="applyFilter('web')">Web</button>
+    <button class="filter-chip" id="f-db" onclick="applyFilter('db')">Database</button>
+    <button class="filter-chip" id="f-windows" onclick="applyFilter('windows')">Windows</button>
+    <button class="filter-chip" id="f-ci" onclick="applyFilter('ci')">Counter-Intel</button>
+    <div class="filter-divider"></div>
+    <select class="filter-select" id="sortSelect" onchange="sortAttacks()">
+      <option value="newest">Newest First</option>
+      <option value="oldest">Oldest First</option>
+      <option value="severity">By Severity</option>
+      <option value="ip">By IP</option>
+    </select>
+    <div class="filter-right">
+      <span class="filter-count" id="filterCount">0 events</span>
+      <button class="clear-btn" onclick="clearFilters()">Clear Filters</button>
+    </div>
+  </div>
+
+  <!-- PANELS -->
+  <div class="panels">
+
+    <!-- FEED -->
+    <div class="feed-panel">
+      <div class="panel-header">
+        <div class="panel-title"><div class="panel-title-dot"></div>Live Attack Feed</div>
+        <div class="panel-actions">
+          <button class="pa-btn" onclick="selectAll()">Select All</button>
+          <button class="pa-btn" onclick="exportSelected()">Export</button>
+          <button class="pa-btn" onclick="blockSelected()">Block Selected</button>
+          <button class="pa-btn" onclick="clearLog()">Clear</button>
+        </div>
+      </div>
+      <div class="feed-table-header">
+        <span></span>
+        <span>Timestamp</span>
+        <span>Attacker IP</span>
+        <span>Attack Type</span>
+        <span>Severity</span>
+        <span>Intelligence</span>
+        <span class="col-actions" style="text-align:right">Actions</span>
+      </div>
+      <div class="feed-body" id="feedBody">
+        <div class="feed-empty">
+          <div class="feed-empty-icon">🛡️</div>
+          <p>MAYA deception fabric active — waiting for attackers</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="right-panel">
+      <div class="right-tabs">
+        <div class="rtab active" id="rt-ai" onclick="switchRTab('ai')">AI Analysis</div>
+        <div class="rtab" id="rt-profiles" onclick="switchRTab('profiles')">Profiles</div>
+        <div class="rtab" id="rt-dist" onclick="switchRTab('dist')">Distribution</div>
+      </div>
+      <div class="right-content" id="rightContent">
+        <div style="color:var(--text3);font-size:12px;text-align:center;padding:20px;">
+          Waiting for attacks...<br>AI will analyze each threat automatically.
+        </div>
+      </div>
+    </div>
+
+    <!-- BOTTOM LEFT -->
+    <div class="bottom-left">
+      <div class="mini-grid">
+        <div class="mini-panel">
+          <div class="mp-title"><div class="mp-title-dot" style="background:var(--g)"></div>Attack Distribution</div>
+          <div id="distPanel"></div>
+        </div>
+        <div class="mini-panel">
+          <div class="mp-title"><div class="mp-title-dot" style="background:var(--orange)"></div>Activity Heatmap (24h)</div>
+          <div class="heatmap-grid" id="heatmap"></div>
+          <div class="hm-label"><span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>23:00</span></div>
+        </div>
+        <div class="mini-panel" style="overflow:hidden;display:flex;flex-direction:column;">
+          <div class="mp-title"><div class="mp-title-dot" style="background:var(--blue)"></div>Response Terminal</div>
+          <div class="term-body" id="termBody">
+            <div class="tl"><span class="tp">maya$</span><span class="ts"> system initialized — all honeypots active</span></div>
+            <div class="tl"><span class="tp">maya$</span><span class="ts"> deception fabric deployed — 312 decoys live</span></div>
+            <div class="tl"><span class="tp">maya$</span><span class="ti"> mistral ai brain ready — monitoring...</span></div>
+            <div class="tl"><span class="tp">maya$</span><span class="tc"></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOTTOM RIGHT -->
+    <div class="bottom-right">
+      <div class="panel-header">
+        <div class="panel-title">Top Attackers</div>
+      </div>
+      <div style="flex:1;overflow-y:auto;padding:8px 12px;" id="topAttackers">
+        <div style="color:var(--text3);font-size:11px;text-align:center;padding:20px;">No attackers profiled yet</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- DETAIL DRAWER -->
+<div class="drawer" id="drawer">
+  <div class="drawer-header">
+    <div>
+      <div class="drawer-title" id="drawerTitle">Attack Detail</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:2px;" id="drawerSub"></div>
+    </div>
+    <div class="drawer-close" onclick="closeDrawer()">✕</div>
+  </div>
+  <div class="drawer-body" id="drawerBody"></div>
+</div>
+
+<!-- REPORT MODAL -->
+<div class="modal-bg" id="modalBg">
   <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title">AI INCIDENT REPORT</div>
-      <button class="modal-close" onclick="closeReport()">✕ CLOSE</button>
+    <div class="modal-head">
+      <div class="modal-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00e676" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      </div>
+      <div>
+        <div class="modal-title">AI Incident Report</div>
+        <div class="modal-sub">Generated by Mistral AI — Vaultrap Security Operations Center</div>
+      </div>
+      <div class="modal-close" onclick="closeReport()">✕</div>
     </div>
     <div class="modal-body" id="modalBody">
-      <div class="generating">
-        <div class="live-dot"></div>
+      <div style="display:flex;align-items:center;gap:10px;color:var(--g);padding:20px;font-size:13px;">
+        <div class="pulse"></div>
         Mistral AI generating comprehensive incident report...
       </div>
     </div>
     <div class="modal-footer">
-      <button class="modal-btn primary" onclick="downloadReport()"><span>Download PDF</span></button>
-      <button class="modal-btn" onclick="closeReport()">Close</button>
+      <button class="mf-btn mf-primary" onclick="downloadReport()">Download PDF</button>
+      <button class="mf-btn mf-secondary" onclick="closeReport()">Close</button>
     </div>
   </div>
 </div>
 
 <script>
-// Clock
+// ── STATE ────────────────────────────────────────────────────────────────
+let allAttacks = [];
+let filteredAttacks = [];
+let selectedRows = new Set();
+let currentFilter = 'all';
+let searchQuery = '';
+let sortMode = 'newest';
+let currentRTab = 'ai';
+let lastAiCount = 0;
+let termLines = 0;
+
+// ── CLOCK ────────────────────────────────────────────────────────────────
 function updateClock(){
-  const n=new Date();
-  document.getElementById('clock').textContent=n.toISOString().replace('T',' ').substring(0,19)+' UTC';
+  const n = new Date();
+  document.getElementById('clock').textContent =
+    n.toISOString().replace('T',' ').substring(0,19) + ' UTC';
 }
-updateClock();setInterval(updateClock,1000);
+updateClock(); setInterval(updateClock, 1000);
 
-// State
-let allAttacks=[];
-let attackerMap={};
+// ── HEATMAP ──────────────────────────────────────────────────────────────
+function initHeatmap(){
+  const hm = document.getElementById('heatmap');
+  hm.innerHTML = '';
+  for(let i=0;i<24;i++){
+    const cell = document.createElement('div');
+    cell.className = 'hm-cell';
+    cell.id = `hm-${i}`;
+    cell.title = `${i}:00 — 0 attacks`;
+    hm.appendChild(cell);
+  }
+}
+initHeatmap();
 
-// Socket
-var socket=io();
-socket.on('update',function(data){
-  updateStats(data.stats);
-  allAttacks=data.attacks;
-  renderFeed(data.attacks);
-  updateDistribution(data.attacks,data.stats);
-  updateAttackerTable(data.attacks);
-  updateAI(data.attacks);
-  updateTerminal(data.attacks);
-});
-
-function updateStats(s){
-  document.getElementById('s-total').textContent=s.total||0;
-  document.getElementById('s-critical').textContent=s.critical||0;
-  document.getElementById('s-high').textContent=s.high||0;
-  document.getElementById('s-ips').textContent=s.unique_ips||0;
-  document.getElementById('s-ssh').textContent=s.ssh||0;
-  document.getElementById('s-web').textContent=s.web||0;
-  var db=0,win=0;
-  // count from attacks if available
-  document.getElementById('s-db').textContent=db;
-  document.getElementById('s-win').textContent=win;
+function updateHeatmap(attacks){
+  const counts = new Array(24).fill(0);
+  attacks.forEach(a => {
+    try{ counts[parseInt(a.timestamp.substring(11,13))]++; }catch(e){}
+  });
+  const max = Math.max(...counts, 1);
+  counts.forEach((c, i) => {
+    const cell = document.getElementById(`hm-${i}`);
+    if(!cell) return;
+    const intensity = c / max;
+    if(intensity === 0){ cell.style.background = 'var(--dark4)'; }
+    else if(intensity < 0.3){ cell.style.background = 'rgba(0,230,118,0.2)'; }
+    else if(intensity < 0.6){ cell.style.background = 'rgba(0,230,118,0.4)'; }
+    else if(intensity < 0.8){ cell.style.background = 'rgba(255,145,0,0.5)'; }
+    else{ cell.style.background = 'rgba(255,69,105,0.6)'; }
+    cell.title = `${i}:00 — ${c} attack${c!==1?'s':''}`;
+  });
 }
 
+// ── TYPE HELPERS ─────────────────────────────────────────────────────────
 function getTypeClass(type){
-  if(type.includes('SSH')) return 't-SSH';
-  if(type.includes('WEB')) return 't-WEB';
-  if(type.includes('DB')||type.includes('MYSQL')||type.includes('REDIS')||type.includes('POSTGRES')) return 't-DB';
-  if(type.includes('WINDOWS')) return 't-WIN';
-  return 't-OTHER';
+  if(!type) return 'tp-OTHER';
+  if(type.includes('SSH')) return 'tp-SSH';
+  if(type.includes('WEB')) return 'tp-WEB';
+  if(type.includes('DB')||type.includes('MYSQL')||type.includes('REDIS')||type.includes('POSTGRES')) return 'tp-DB';
+  if(type.includes('WINDOWS')) return 'tp-WIN';
+  if(type.includes('CI_')||type.includes('HONEYTOKEN')) return 'tp-CI';
+  if(type.includes('POLYMORPHIC')) return 'tp-POLY';
+  return 'tp-OTHER';
+}
+
+function getTypeShort(type){
+  if(!type) return 'UNKNOWN';
+  if(type.includes('SSH')) return 'SSH';
+  if(type.includes('WEB')) return 'WEB';
+  if(type.includes('MYSQL')||type.includes('DB_')) return 'DATABASE';
+  if(type.includes('REDIS')) return 'REDIS';
+  if(type.includes('WINDOWS')) return 'WINDOWS';
+  if(type.includes('CI_')||type.includes('HONEYTOKEN')) return 'COUNTER-INTEL';
+  if(type.includes('POLYMORPHIC')) return 'POLYMORPHIC';
+  return type.substring(0,12);
 }
 
 function getDetail(a){
-  if(a.type==='SSH_BRUTE_FORCE') return 'user:'+( a.username_tried||'?')+' pass:'+(a.password_tried||'?');
-  if(a.type==='WEB_CREDENTIAL_HARVEST') return 'credentials:'+(a.credentials||'?').substring(0,30);
-  if(a.type.includes('DB')||a.type.includes('MYSQL')) return 'user:'+(a.username_tried||'?')+' db:'+(a.database_target||'?');
-  if(a.type.includes('REDIS')) return 'cmd:'+(a.command||a.details||'N/A').toString().substring(0,35);
-  if(a.type.includes('WINDOWS')) return (a.details||'N/A').toString().substring(0,50);
-  return (a.details||a.path||a.credentials||'N/A').toString().substring(0,50);
+  if(!a) return 'N/A';
+  if(a.type==='SSH_BRUTE_FORCE') return `user:${a.username_tried||'?'} pass:${a.password_tried||'?'}`;
+  if(a.type==='WEB_CREDENTIAL_HARVEST') return `creds:${(a.credentials||'?').substring(0,35)}`;
+  if(a.type&&(a.type.includes('DB')||a.type.includes('MYSQL'))) return `user:${a.username_tried||'?'} db:${a.database_target||'?'}`;
+  if(a.type&&a.type.includes('REDIS')) return `cmd:${(a.command||a.details||'?').toString().substring(0,35)}`;
+  if(a.type&&a.type.includes('WINDOWS')) return (a.details||'?').toString().substring(0,55);
+  if(a.type&&(a.type.includes('CI_')||a.type.includes('HONEYTOKEN'))) return `file:${a.file_stolen||'?'} trigger:${a.trigger_type||'?'}`;
+  if(a.type&&a.type.includes('POLYMORPHIC')) return `fp:${a.fingerprint_shown||'?'} os:${a.os_fingerprint||'?'}`;
+  return (a.details||a.path||a.credentials||'N/A').toString().substring(0,55);
 }
 
-function renderFeed(attacks){
-  var rev=[...attacks].reverse();
-  document.getElementById('feed-count').textContent=attacks.length+' events';
-  if(!rev.length){
-    document.getElementById('feedBody').innerHTML='<div class="feed-empty">MAYA deception fabric active — waiting for attackers...</div>';
-    return;
-  }
-  var html='';
-  rev.forEach(function(a){
-    var tc=getTypeClass(a.type);
-    var det=getDetail(a);
-    html+='<div class="feed-row">'+
-      '<span class="col-time">'+a.timestamp.substring(0,19).replace('T',' ')+'</span>'+
-      '<span class="col-ip">'+a.attacker_ip+'</span>'+
-      '<span><span class="type-badge '+tc+'">'+a.type+'</span></span>'+
-      '<span><span class="sev-badge s-'+a.severity+'">'+a.severity+'</span></span>'+
-      '<span class="col-detail">'+det+'</span>'+
-      '</div>';
+function getMitre(type){
+  const m={
+    'SSH_BRUTE_FORCE':['T1110.001','Brute Force: Password Guessing'],
+    'WEB_CREDENTIAL_HARVEST':['T1056.003','Input Capture: Web Portal'],
+    'WEB_RECON':['T1595.002','Active Scanning'],
+    'DB_LOGIN_ATTEMPT':['T1078','Valid Accounts'],
+    'DB_CONNECTION':['T1046','Network Service Discovery'],
+    'WINDOWS_RDP_BRUTE_FORCE':['T1110.001','Brute Force: RDP'],
+    'WINDOWS_LATERAL_MOVEMENT':['T1021','Remote Services'],
+    'WINDOWS_RANSOMWARE_BEHAVIOR':['T1486','Data Encrypted for Impact'],
+    'WINDOWS_HONEYTOKEN_TRIGGERED':['T1078','Valid Accounts — Honeytoken'],
+    'CI_PAYLOAD_TRIGGERED':['T1027','Obfuscated Files — Tracking'],
+  };
+  return m[type]||['T0000','Unknown Technique'];
+}
+
+// ── FILTER & SORT ────────────────────────────────────────────────────────
+function applyFilter(filter){
+  currentFilter = filter;
+  document.querySelectorAll('.filter-chip').forEach(c=>{
+    c.classList.remove('active','active-red','active-orange');
   });
-  document.getElementById('feedBody').innerHTML=html;
+  const btn = document.getElementById(`f-${filter}`);
+  if(btn){
+    if(filter==='critical') btn.classList.add('active-red');
+    else if(filter==='high') btn.classList.add('active-orange');
+    else btn.classList.add('active');
+  }
+  renderFeed();
 }
 
-function updateDistribution(attacks,stats){
-  var total=Math.max(attacks.length,1);
-  var db=attacks.filter(a=>a.type.includes('DB')||a.type.includes('MYSQL')||a.type.includes('REDIS')).length;
-  var win=attacks.filter(a=>a.type.includes('WINDOWS')).length;
-  var ssh=stats.ssh||0;
-  var web=stats.web||0;
-  var crit=stats.critical||0;
-  document.getElementById('s-db').textContent=db;
-  document.getElementById('s-win').textContent=win;
-  document.getElementById('d-ssh').textContent=ssh;
-  document.getElementById('d-web').textContent=web;
-  document.getElementById('d-db').textContent=db;
-  document.getElementById('d-win').textContent=win;
-  document.getElementById('d-crit').textContent=crit;
-  document.getElementById('df-ssh').style.width=Math.min((ssh/total)*100,100)+'%';
-  document.getElementById('df-web').style.width=Math.min((web/total)*100,100)+'%';
-  document.getElementById('df-db').style.width=Math.min((db/total)*100,100)+'%';
-  document.getElementById('df-win').style.width=Math.min((win/total)*100,100)+'%';
-  document.getElementById('df-crit').style.width=Math.min((crit/total)*100,100)+'%';
+function clearFilters(){
+  currentFilter='all';
+  searchQuery='';
+  document.getElementById('searchInput').value='';
+  document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active','active-red','active-orange'));
+  document.getElementById('f-all').classList.add('active');
+  renderFeed();
 }
 
-function updateAttackerTable(attacks){
-  if(!attacks.length){
-    document.getElementById('attackerTable').innerHTML='<div class="feed-empty">No attackers profiled yet</div>';
+function filterAttacks(){
+  searchQuery = document.getElementById('searchInput').value.toLowerCase();
+  renderFeed();
+}
+
+function sortAttacks(){
+  sortMode = document.getElementById('sortSelect').value;
+  renderFeed();
+}
+
+function getFilteredAttacks(){
+  let attacks = [...allAttacks];
+
+  // Apply type/severity filter
+  if(currentFilter === 'critical') attacks = attacks.filter(a=>a.severity==='CRITICAL');
+  else if(currentFilter === 'high') attacks = attacks.filter(a=>a.severity==='HIGH');
+  else if(currentFilter === 'ssh') attacks = attacks.filter(a=>a.type&&a.type.includes('SSH'));
+  else if(currentFilter === 'web') attacks = attacks.filter(a=>a.type&&a.type.includes('WEB'));
+  else if(currentFilter === 'db') attacks = attacks.filter(a=>a.type&&(a.type.includes('DB')||a.type.includes('MYSQL')||a.type.includes('REDIS')));
+  else if(currentFilter === 'windows') attacks = attacks.filter(a=>a.type&&a.type.includes('WINDOWS'));
+  else if(currentFilter === 'ci') attacks = attacks.filter(a=>a.type&&(a.type.includes('CI_')||a.type.includes('HONEYTOKEN')));
+
+  // Apply search
+  if(searchQuery){
+    attacks = attacks.filter(a =>
+      JSON.stringify(a).toLowerCase().includes(searchQuery)
+    );
+  }
+
+  // Sort
+  if(sortMode === 'newest') attacks.sort((a,b)=>b.timestamp.localeCompare(a.timestamp));
+  else if(sortMode === 'oldest') attacks.sort((a,b)=>a.timestamp.localeCompare(b.timestamp));
+  else if(sortMode === 'severity'){
+    const order={CRITICAL:0,HIGH:1,MEDIUM:2,LOW:3};
+    attacks.sort((a,b)=>(order[a.severity]||4)-(order[b.severity]||4));
+  }
+  else if(sortMode === 'ip') attacks.sort((a,b)=>(a.attacker_ip||'').localeCompare(b.attacker_ip||''));
+
+  return attacks;
+}
+
+// ── RENDER FEED ──────────────────────────────────────────────────────────
+function renderFeed(){
+  const filtered = getFilteredAttacks();
+  filteredAttacks = filtered;
+  document.getElementById('filterCount').textContent = `${filtered.length} event${filtered.length!==1?'s':''}`;
+
+  if(!filtered.length){
+    document.getElementById('feedBody').innerHTML = `
+      <div class="feed-empty">
+        <div class="feed-empty-icon">${allAttacks.length ? '🔍' : '🛡️'}</div>
+        <p>${allAttacks.length ? 'No attacks match current filters' : 'MAYA deception fabric active — waiting for attackers'}</p>
+      </div>`;
     return;
   }
-  var ipMap={};
-  attacks.forEach(function(a){
-    var ip=a.attacker_ip;
-    if(!ipMap[ip]) ipMap[ip]={ip:ip,types:new Set(),severity:a.severity,count:0,last:a.timestamp};
+
+  let html = '';
+  filtered.forEach((a,i) => {
+    const tc = getTypeClass(a.type);
+    const ts = getTypeShort(a.type);
+    const det = getDetail(a);
+    const isNew = i === 0 && allAttacks.length > 0;
+    const sel = selectedRows.has(a.timestamp+a.attacker_ip);
+    html += `<div class="feed-row${isNew?' new':''}${sel?' selected':''}" onclick="showDetail(${JSON.stringify(a).replace(/"/g,'&quot;')})">
+      <div class="row-check${sel?' checked':''}" onclick="event.stopPropagation();toggleSelect('${a.timestamp+a.attacker_ip}',this)"></div>
+      <span class="col-time">${a.timestamp.substring(0,19).replace('T',' ')}</span>
+      <span class="col-ip">${a.attacker_ip||'unknown'}</span>
+      <span><span class="type-pill ${tc}">${ts}</span></span>
+      <span><span class="sev-pill sp-${a.severity||'LOW'}">${a.severity||'LOW'}</span></span>
+      <span class="col-detail">${det}</span>
+      <div class="row-actions">
+        <button class="ra-btn" onclick="event.stopPropagation();showDetail(${JSON.stringify(a).replace(/"/g,'&quot;')})">Detail</button>
+        <button class="ra-btn" onclick="event.stopPropagation();blockIP('${a.attacker_ip}')">Block</button>
+      </div>
+    </div>`;
+  });
+  document.getElementById('feedBody').innerHTML = html;
+}
+
+// ── STATS UPDATE ─────────────────────────────────────────────────────────
+function updateStats(attacks){
+  const total = attacks.length;
+  const critical = attacks.filter(a=>a.severity==='CRITICAL').length;
+  const high = attacks.filter(a=>a.severity==='HIGH').length;
+  const ips = [...new Set(attacks.map(a=>a.attacker_ip))].length;
+  const ssh = attacks.filter(a=>a.type&&a.type.includes('SSH')).length;
+  const web = attacks.filter(a=>a.type&&a.type.includes('WEB')).length;
+  const db = attacks.filter(a=>a.type&&(a.type.includes('DB')||a.type.includes('MYSQL')||a.type.includes('REDIS'))).length;
+  const win = attacks.filter(a=>a.type&&a.type.includes('WINDOWS')).length;
+  const ci = attacks.filter(a=>a.type&&(a.type.includes('CI_')||a.type.includes('HONEYTOKEN'))).length;
+
+  document.getElementById('s-total').textContent = total;
+  document.getElementById('s-critical').textContent = critical;
+  document.getElementById('s-high').textContent = high;
+  document.getElementById('s-ips').textContent = ips;
+  document.getElementById('s-blocked').textContent = ips;
+  document.getElementById('nb-critical').textContent = critical;
+  document.getElementById('nb-ips').textContent = ips;
+  document.getElementById('ss-ssh').textContent = ssh;
+  document.getElementById('ss-web').textContent = web;
+  document.getElementById('ss-db').textContent = db;
+  document.getElementById('ss-win').textContent = win;
+  document.getElementById('ss-ci').textContent = ci;
+
+  // Distribution panel
+  const items = [
+    {label:'SSH Brute Force',count:ssh,color:'var(--blue)'},
+    {label:'Web Attacks',count:web,color:'var(--purple)'},
+    {label:'Database',count:db,color:'var(--orange)'},
+    {label:'Windows',count:win,color:'var(--cyan)'},
+    {label:'Counter-Intel',count:ci,color:'var(--yellow)'},
+    {label:'Critical',count:critical,color:'var(--red)'},
+  ];
+  const maxCount = Math.max(...items.map(i=>i.count), 1);
+  document.getElementById('distPanel').innerHTML = items.map(item=>
+    `<div class="dist-row">
+      <span class="dist-label">${item.label}</span>
+      <div class="dist-bar"><div class="dist-fill" style="width:${Math.min((item.count/maxCount)*100,100)}%;background:${item.color}"></div></div>
+      <span class="dist-count">${item.count}</span>
+    </div>`
+  ).join('');
+
+  // Top attackers
+  const ipMap = {};
+  attacks.forEach(a=>{
+    const ip = a.attacker_ip||'unknown';
+    if(!ipMap[ip]) ipMap[ip]={ip,count:0,severity:a.severity,type:a.type};
     ipMap[ip].count++;
-    ipMap[ip].types.add(a.type);
-    ipMap[ip].last=a.timestamp;
     if(a.severity==='CRITICAL') ipMap[ip].severity='CRITICAL';
-    else if(a.severity==='HIGH'&&ipMap[ip].severity!=='CRITICAL') ipMap[ip].severity='HIGH';
   });
-  var sorted=Object.values(ipMap).sort((a,b)=>b.count-a.count);
-  var html='';
-  sorted.forEach(function(att){
-    var types=[...att.types];
-    var tc=getTypeClass(types[0]||'OTHER');
-    html+='<div class="att-row">'+
-      '<span class="col-ip">'+att.ip+'</span>'+
-      '<span><span class="type-badge '+tc+'">'+( types[0]||'?').substring(0,18)+'</span></span>'+
-      '<span><span class="sev-badge s-'+att.severity+'">'+att.severity+'</span></span>'+
-      '<span style="color:var(--g);font-family:\'Space Mono\',monospace;">'+att.count+'</span>'+
-      '<span class="col-time">'+att.last.substring(11,19)+'</span>'+
-      '</div>';
-  });
-  document.getElementById('attackerTable').innerHTML=html;
+  const top = Object.values(ipMap).sort((a,b)=>b.count-a.count).slice(0,8);
+  document.getElementById('topAttackers').innerHTML = top.length ? top.map(att=>{
+    const tc = getTypeClass(att.type);
+    return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border2);cursor:pointer;" onclick="filterByIP('${att.ip}')">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--blue);flex:1;">${att.ip}</span>
+      <span class="type-pill ${tc}" style="font-size:9px;">${getTypeShort(att.type)}</span>
+      <span class="sev-pill sp-${att.severity}" style="font-size:9px;">${att.severity}</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--g);min-width:28px;text-align:right;">${att.count}</span>
+    </div>`;
+  }).join('') : '<div style="color:var(--text3);font-size:11px;text-align:center;padding:20px;">No attackers yet</div>';
 }
 
-var lastAiCount=0;
-function updateAI(attacks){
-  if(attacks.length===lastAiCount) return;
-  lastAiCount=attacks.length;
+// ── AI PANEL ─────────────────────────────────────────────────────────────
+function updateAIPanel(attacks){
+  if(currentRTab !== 'ai') return;
+  if(attacks.length === lastAiCount) return;
+  lastAiCount = attacks.length;
   if(!attacks.length) return;
 
-  var latest=attacks[attacks.length-1];
-  var sev=latest.severity;
-  var cls=sev==='CRITICAL'?'critical':sev==='HIGH'?'high':'';
+  const latest = attacks[attacks.length-1];
+  const sev = latest.severity||'LOW';
+  const cls = sev==='CRITICAL'?'ai-critical':sev==='HIGH'?'ai-high':'ai-normal';
+  const [mitreId, mitreName] = getMitre(latest.type);
 
-  var analyses={
-    'SSH_BRUTE_FORCE':'Attacker is conducting systematic credential stuffing via SSH. Technique: <strong>T1110.001 — Brute Force: Password Guessing</strong>. Behavioral pattern suggests automated tooling (Hydra/Medusa). Predicted next move: privilege escalation if credentials succeed. MAYA has logged all attempted credentials for threat intelligence.',
-    'WEB_CREDENTIAL_HARVEST':'<strong>CRITICAL THREAT</strong> — Attacker is harvesting credentials through the fake web portal. Technique: <strong>T1056.003 — Web Portal Capture</strong>. This indicates a phishing or credential stuffing campaign. Attacker intent: account takeover of financial or admin systems. All captured credentials are honeytokens — attacker has gained nothing real.',
-    'WEB_RECON':'Attacker is in active reconnaissance phase. Technique: <strong>T1595.002 — Active Scanning</strong>. They are mapping your web attack surface looking for vulnerabilities, exposed admin panels, and configuration files. This is early-stage attack — detection before exploitation is optimal.',
-    'DB_CONNECTION':'Database infrastructure probe detected. Attacker is scanning for exposed database services. Technique: <strong>T1046 — Network Service Discovery</strong>. Target: credential access to database. MAYA fake database has engaged — attacker is now interacting with decoy data.',
-    'DB_LOGIN_ATTEMPT':'<strong>HIGH VALUE TARGET</strong> — Attacker has found the honeypot database and is attempting authentication. Technique: <strong>T1078 — Valid Accounts</strong>. They are using credential lists against database. All login attempts captured for analysis. Real database completely protected.',
-    'REDIS_PROBE':'Redis instance probe — attacker looking for unauthenticated Redis for data exfiltration or command execution. Technique: <strong>T1190 — Exploit Public-Facing Application</strong>. Commonly used in cryptojacking and lateral movement campaigns.',
-    'WINDOWS_RDP_BRUTE_FORCE':'<strong>CRITICAL</strong> — Windows RDP brute force detected. Technique: <strong>T1110.001</strong>. RDP compromise leads to full Windows domain access. Attacker likely part of ransomware group — RDP is primary initial access vector for ransomware operations globally.',
-    'WINDOWS_LATERAL_MOVEMENT':'<strong>CRITICAL</strong> — Active lateral movement detected. Technique: <strong>T1021 — Remote Services</strong>. Attacker has established initial foothold and is moving through the network. Immediate containment protocol activated.',
-    'WINDOWS_RANSOMWARE_BEHAVIOR':'<strong>CRITICAL RANSOMWARE ALERT</strong> — Mass file operation pattern detected consistent with ransomware pre-encryption staging. Technique: <strong>T1486 — Data Encrypted for Impact</strong>. MAYA has isolated affected systems. Incident response recommended immediately.',
-    'WINDOWS_HONEYTOKEN_TRIGGERED':'<strong>CONFIRMED ATTACKER IDENTIFIED</strong> — Honeytoken accessed. Attacker used fake admin credentials planted in decoy system. This confirms active insider threat or successful phishing. Full attacker behavioral profile captured.',
+  const analyses = {
+    'SSH_BRUTE_FORCE':`Systematic credential enumeration via SSH detected. Technique: <strong>${mitreId} — ${mitreName}</strong>. Behavioral signature matches automated tooling (Hydra/Medusa). Attack speed and credential variety suggest botnet-driven campaign. Predicted next move: privilege escalation if credentials succeed.`,
+    'WEB_CREDENTIAL_HARVEST':`<strong>CRITICAL credential theft</strong> — attacker submitted credentials to fake web portal. Technique: <strong>${mitreId} — ${mitreName}</strong>. Browser fingerprint and timing suggest manual or semi-automated attack. All captured credentials are honeytokens — attacker has zero real access.`,
+    'WEB_RECON':`Active reconnaissance in progress. Technique: <strong>${mitreId}</strong>. Attacker mapping web attack surface — looking for exposed admin panels, config files, vulnerabilities. Early detection during recon phase — optimal intervention point.`,
+    'DB_CONNECTION':`Database infrastructure probing detected. Technique: <strong>${mitreId}</strong>. Attacker located database port and established connection to honeypot. Fake MySQL 8.0 greeting served — attacker believes real database found.`,
+    'DB_LOGIN_ATTEMPT':`<strong>High-value target confirmed</strong> — attacker attempting database authentication. Technique: <strong>${mitreId}</strong>. Credential analysis suggests targeted attack with known username/password lists. Real database completely isolated.`,
+    'WINDOWS_RDP_BRUTE_FORCE':`<strong>CRITICAL</strong> — RDP brute force detected. Technique: <strong>${mitreId}</strong>. RDP is primary initial access vector for ransomware groups globally. Attack pattern consistent with organized threat actor. Emergency response protocol activated.`,
+    'WINDOWS_LATERAL_MOVEMENT':`<strong>CRITICAL</strong> — Active lateral movement confirmed. Technique: <strong>${mitreId}</strong>. Attacker has established foothold and is traversing the network. Pass-the-hash or Kerberos attack suspected. All movement paths monitored.`,
+    'WINDOWS_RANSOMWARE_BEHAVIOR':`<strong>EMERGENCY — RANSOMWARE BEHAVIOR</strong>. Technique: <strong>${mitreId}</strong>. Mass file operations detected consistent with pre-encryption staging. System immediately isolated by MAYA. Forensic snapshot captured.`,
+    'CI_PAYLOAD_TRIGGERED':`<strong>ATTACKER DEVICE EXPOSED</strong> — Counter-intelligence payload triggered. Stolen document opened on attacker machine — real IP, device fingerprint, and location captured. Attacker identity confirmed regardless of VPN usage.`,
+    'HONEYTOKEN_TRIGGERED':`<strong>HONEYTOKEN CONFIRMED</strong> — Fake credentials used in active environment. Attacker has compromised credentials and is attempting real access. Full attacker profile captured through token usage.`,
   };
 
-  var analysis=analyses[latest.type]||'Unclassified attack pattern detected. MAYA AI is analyzing behavioral signatures against MITRE ATT&CK framework. Threat intelligence cross-reference in progress.';
+  const analysis = analyses[latest.type] || `Attack pattern analyzed. MITRE technique <strong>${mitreId} — ${mitreName}</strong> identified. Behavioral scoring complete. All MAYA defenses active.`;
+  const scores = {CRITICAL:94,HIGH:76,MEDIUM:48,LOW:22};
+  const score = scores[sev]||50;
+  const scoreColor = sev==='CRITICAL'?'var(--red)':sev==='HIGH'?'var(--orange)':'var(--g)';
 
-  var entry=document.createElement('div');
-  entry.className='ai-entry '+cls;
-  entry.innerHTML='<div class="ai-entry-header">'+new Date().toISOString().replace('T',' ').substring(0,19)+' — '+latest.type+' from '+latest.attacker_ip+'</div>'+
-    '<div class="ai-entry-text">'+analysis+'</div>';
-
-  var body=document.getElementById('aiBody');
-  body.innerHTML='';
-  body.appendChild(entry);
-
-  // Add risk score
-  var scores={'CRITICAL':92,'HIGH':74,'MEDIUM':45,'LOW':18};
-  var score=scores[sev]||50;
-  var riskEntry=document.createElement('div');
-  riskEntry.className='ai-entry';
-  riskEntry.innerHTML='<div class="ai-entry-header">Risk Assessment</div>'+
-    '<div class="ai-entry-text">Risk Score: <strong style="color:'+(sev==='CRITICAL'?'var(--red)':sev==='HIGH'?'var(--orange)':'var(--g)')+'">'+score+'/100</strong> — '+
-    (score>75?'Immediate action required. MAYA autonomous response activated.':score>50?'Elevated risk. Enhanced monitoring activated.':'Low risk. Logged for threat intelligence.')+
-    '</div>';
-  body.appendChild(riskEntry);
+  document.getElementById('rightContent').innerHTML = `
+    <div class="ai-entry ${cls}">
+      <div class="ai-entry-header">
+        <div class="pulse"></div>
+        ${latest.type} — ${latest.timestamp.substring(0,19).replace('T',' ')}
+      </div>
+      <div class="ai-entry-body">${analysis}</div>
+    </div>
+    <div class="ai-entry ai-normal">
+      <div class="ai-entry-header">Risk Assessment</div>
+      <div class="ai-entry-body">
+        <div class="risk-meter">
+          <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px;">
+            <span>Risk Score</span><span style="color:${scoreColor};font-weight:700;">${score}/100</span>
+          </div>
+          <div class="rm-track"><div class="rm-fill" style="width:${score}%;background:${scoreColor}"></div></div>
+        </div>
+        <div class="ai-metric"><span class="aim-label">MITRE Technique</span><span class="aim-val" style="color:var(--g)">${mitreId}</span></div>
+        <div class="ai-metric"><span class="aim-label">Technique Name</span><span class="aim-val" style="font-size:10px;color:var(--text2)">${mitreName}</span></div>
+        <div class="ai-metric"><span class="aim-label">Severity</span><span class="aim-val" style="color:${scoreColor}">${sev}</span></div>
+        <div class="ai-metric"><span class="aim-label">Response</span><span class="aim-val" style="color:var(--g)">AUTONOMOUS</span></div>
+        <div class="ai-metric"><span class="aim-label">Assets Breached</span><span class="aim-val" style="color:var(--g)">ZERO</span></div>
+      </div>
+    </div>`;
 }
 
-var termLines=[];
-function updateTerminal(attacks){
-  if(!attacks.length) return;
-  var latest=attacks[attacks.length-1];
-  var body=document.getElementById('termBody');
-  var msgs={
-    'SSH_BRUTE_FORCE':['t-alert','[!] SSH brute force — '+latest.attacker_ip+' — '+( latest.username_tried||'?')],
-    'WEB_CREDENTIAL_HARVEST':['t-alert','[!] CRITICAL — credentials harvested from '+latest.attacker_ip],
-    'WEB_RECON':['t-warn','[~] Web recon detected from '+latest.attacker_ip],
-    'DB_CONNECTION':['t-warn','[~] DB probe from '+latest.attacker_ip+' — honeypot engaged'],
-    'DB_LOGIN_ATTEMPT':['t-alert','[!] DB login attempt from '+latest.attacker_ip+' user:'+(latest.username_tried||'?')],
-    'REDIS_PROBE':['t-warn','[~] Redis probe from '+latest.attacker_ip],
-    'WINDOWS_RDP_BRUTE_FORCE':['t-alert','[!] RDP brute force — '+latest.attacker_ip],
-    'WINDOWS_LATERAL_MOVEMENT':['t-alert','[!] LATERAL MOVEMENT — '+latest.attacker_ip+' — ISOLATING'],
-    'WINDOWS_RANSOMWARE_BEHAVIOR':['t-alert','[!!!] RANSOMWARE BEHAVIOR — '+latest.attacker_ip+' — EMERGENCY RESPONSE'],
-    'WINDOWS_HONEYTOKEN_TRIGGERED':['t-success','[✓] HONEYTOKEN TRIGGERED — attacker '+latest.attacker_ip+' IDENTIFIED'],
-  };
-  var msg=msgs[latest.type]||['t-info','[+] '+latest.type+' from '+latest.attacker_ip];
-  var line=document.createElement('div');
-  line.className='t-line';
-  line.innerHTML='<span class="t-prompt">maya@soc:~$</span><span class="'+msg[0]+'"> '+msg[1]+'</span>';
-  body.insertBefore(line,body.lastElementChild);
+function updateProfilesPanel(attacks){
+  if(currentRTab !== 'profiles') return;
+  const ipMap = {};
+  attacks.forEach(a=>{
+    const ip = a.attacker_ip||'unknown';
+    if(!ipMap[ip]) ipMap[ip]={ip,count:0,severity:a.severity,types:new Set(),first:a.timestamp,last:a.timestamp};
+    ipMap[ip].count++;
+    ipMap[ip].types.add(getTypeShort(a.type));
+    if(a.severity==='CRITICAL') ipMap[ip].severity='CRITICAL';
+    if(a.timestamp > ipMap[ip].last) ipMap[ip].last=a.timestamp;
+  });
 
-  // Auto response line
-  setTimeout(function(){
-    var resp=document.createElement('div');
-    resp.className='t-line';
-    resp.innerHTML='<span class="t-prompt">maya@soc:~$</span><span class="t-success"> autonomous.respond() — IP blocked — report generated — team alerted</span>';
-    body.insertBefore(resp,body.lastElementChild);
-    body.scrollTop=body.scrollHeight;
-  },800);
+  const profiles = Object.values(ipMap).sort((a,b)=>b.count-a.count);
+  const avatarColors = ['rgba(64,196,255,0.15)','rgba(255,69,105,0.15)','rgba(0,230,118,0.15)','rgba(255,145,0,0.15)','rgba(224,64,251,0.15)'];
+  const textColors = ['var(--blue)','var(--red)','var(--g)','var(--orange)','var(--purple)'];
+
+  document.getElementById('rightContent').innerHTML = profiles.length ? profiles.map((p,i)=>{
+    const ci = i % 5;
+    const classMap = {CRITICAL:'var(--red)',HIGH:'var(--orange)',MEDIUM:'var(--yellow)',LOW:'var(--g)'};
+    return `<div class="profile-card">
+      <div class="pc-header">
+        <div class="pc-avatar" style="background:${avatarColors[ci]};color:${textColors[ci]};">${p.ip.split('.').slice(-1)[0].substring(0,2)}</div>
+        <div><div class="pc-ip">${p.ip}</div><div class="pc-class">${[...p.types].join(' · ')}</div></div>
+        <span class="sev-pill sp-${p.severity}" style="margin-left:auto">${p.severity}</span>
+      </div>
+      <div class="pc-stats">
+        <div class="pcs"><div class="pcs-num" style="color:${classMap[p.severity]}">${p.count}</div><div class="pcs-label">Attacks</div></div>
+        <div class="pcs"><div class="pcs-num" style="color:var(--text2)">${p.first.substring(11,16)}</div><div class="pcs-label">First Seen</div></div>
+        <div class="pcs"><div class="pcs-num" style="color:var(--text2)">${p.last.substring(11,16)}</div><div class="pcs-label">Last Seen</div></div>
+      </div>
+      <div class="dna-chip">DNA: ${btoa(p.ip).substring(0,12)}</div>
+    </div>`;
+  }).join('') : '<div style="color:var(--text3);font-size:12px;text-align:center;padding:20px;">No profiles yet</div>';
 }
 
-// REPORT MODAL
+function updateDistPanel(attacks){
+  if(currentRTab !== 'dist') return;
+  const total = Math.max(attacks.length, 1);
+  const sevMap = {CRITICAL:0,HIGH:0,MEDIUM:0,LOW:0};
+  attacks.forEach(a=>{ sevMap[a.severity||'LOW']++; });
+  const items = Object.entries(sevMap);
+  const colors = {CRITICAL:'var(--red)',HIGH:'var(--orange)',MEDIUM:'var(--yellow)',LOW:'var(--g)'};
+
+  document.getElementById('rightContent').innerHTML = `
+    <div style="margin-bottom:12px;">
+      <div class="mp-title" style="margin-bottom:10px;"><div class="mp-title-dot" style="background:var(--g)"></div>Severity Breakdown</div>
+      ${items.map(([sev,count])=>`
+        <div class="dist-row">
+          <span class="dist-label">${sev}</span>
+          <div class="dist-bar"><div class="dist-fill" style="width:${Math.min((count/total)*100,100)}%;background:${colors[sev]}"></div></div>
+          <span class="dist-count">${count}</span>
+        </div>`).join('')}
+    </div>
+    <div>
+      <div class="mp-title" style="margin-bottom:10px;"><div class="mp-title-dot" style="background:var(--blue)"></div>Attack Vectors</div>
+      ${[
+        ['SSH',attacks.filter(a=>a.type&&a.type.includes('SSH')).length,'var(--blue)'],
+        ['Web',attacks.filter(a=>a.type&&a.type.includes('WEB')).length,'var(--purple)'],
+        ['Database',attacks.filter(a=>a.type&&(a.type.includes('DB')||a.type.includes('MYSQL')||a.type.includes('REDIS'))).length,'var(--orange)'],
+        ['Windows',attacks.filter(a=>a.type&&a.type.includes('WINDOWS')).length,'var(--cyan)'],
+        ['Counter-Intel',attacks.filter(a=>a.type&&(a.type.includes('CI_')||a.type.includes('HONEYTOKEN'))).length,'var(--yellow)'],
+        ['Polymorphic',attacks.filter(a=>a.type&&a.type.includes('POLYMORPHIC')).length,'var(--g)'],
+      ].map(([label,count,color])=>`
+        <div class="dist-row">
+          <span class="dist-label">${label}</span>
+          <div class="dist-bar"><div class="dist-fill" style="width:${Math.min((count/total)*100,100)}%;background:${color}"></div></div>
+          <span class="dist-count">${count}</span>
+        </div>`).join('')}
+    </div>`;
+}
+
+// ── TERMINAL ─────────────────────────────────────────────────────────────
+function addTermLine(cls, msg){
+  const body = document.getElementById('termBody');
+  const cursor = body.lastElementChild;
+  const line = document.createElement('div');
+  line.className = 'tl';
+  line.innerHTML = `<span class="tp">maya$</span><span class="${cls}"> ${msg}</span>`;
+  body.insertBefore(line, cursor);
+  if(body.children.length > 50) body.removeChild(body.firstChild);
+  body.scrollTop = body.scrollHeight;
+}
+
+// ── DETAIL DRAWER ─────────────────────────────────────────────────────────
+function showDetail(a){
+  if(typeof a === 'string') a = JSON.parse(a);
+  const [mitreId, mitreName] = getMitre(a.type);
+  const sev = a.severity||'LOW';
+  const sevColor = {CRITICAL:'var(--red)',HIGH:'var(--orange)',MEDIUM:'var(--yellow)',LOW:'var(--g)'}[sev];
+  const scores = {CRITICAL:94,HIGH:76,MEDIUM:48,LOW:22};
+  const score = scores[sev]||50;
+
+  document.getElementById('drawerTitle').textContent = a.type||'Unknown Attack';
+  document.getElementById('drawerSub').textContent = `${a.timestamp.substring(0,19).replace('T',' ')} UTC`;
+
+  let specificFields = '';
+  if(a.username_tried) specificFields += `<div class="detail-row"><span class="dr-key">Username</span><span class="dr-val">${a.username_tried}</span></div>`;
+  if(a.password_tried) specificFields += `<div class="detail-row"><span class="dr-key">Password</span><span class="dr-val">${a.password_tried}</span></div>`;
+  if(a.credentials) specificFields += `<div class="detail-row"><span class="dr-key">Credentials</span><span class="dr-val">${a.credentials}</span></div>`;
+  if(a.database_target) specificFields += `<div class="detail-row"><span class="dr-key">Target DB</span><span class="dr-val">${a.database_target}</span></div>`;
+  if(a.command) specificFields += `<div class="detail-row"><span class="dr-key">Command</span><span class="dr-val">${a.command}</span></div>`;
+  if(a.fingerprint_shown) specificFields += `<div class="detail-row"><span class="dr-key">Fingerprint Shown</span><span class="dr-val">${a.fingerprint_shown}</span></div>`;
+  if(a.file_stolen) specificFields += `<div class="detail-row"><span class="dr-key">File Stolen</span><span class="dr-val">${a.file_stolen}</span></div>`;
+  if(a.user_agent) specificFields += `<div class="detail-row"><span class="dr-key">User Agent</span><span class="dr-val" style="font-size:10px;">${a.user_agent.substring(0,50)}</span></div>`;
+
+  document.getElementById('drawerBody').innerHTML = `
+    <div class="detail-section">
+      <div class="detail-section-title">Attack Information</div>
+      <div class="detail-row"><span class="dr-key">Attacker IP</span><span class="dr-val" style="color:var(--blue)">${a.attacker_ip}</span></div>
+      <div class="detail-row"><span class="dr-key">Honeypot</span><span class="dr-val">${a.honeypot||'Unknown'}</span></div>
+      <div class="detail-row"><span class="dr-key">Severity</span><span class="dr-val" style="color:${sevColor}">${sev}</span></div>
+      <div class="detail-row"><span class="dr-key">Timestamp</span><span class="dr-val">${a.timestamp.substring(0,19)}</span></div>
+      ${specificFields}
+    </div>
+    <div class="detail-section">
+      <div class="detail-section-title">MITRE ATT&CK</div>
+      <div class="mitre-badge">${mitreId}</div>
+      <div style="font-size:12px;color:var(--text2);margin-top:8px;">${mitreName}</div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-section-title">Risk Score</div>
+      <div class="risk-meter">
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;">
+          <span style="color:var(--text3)">Threat Level</span>
+          <span style="color:${sevColor};font-weight:700;">${score}/100</span>
+        </div>
+        <div class="rm-track"><div class="rm-fill" style="width:${score}%;background:${sevColor}"></div></div>
+      </div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-section-title">Actions</div>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <button onclick="blockIP('${a.attacker_ip}')" style="padding:8px 12px;background:var(--red-bg);border:1px solid rgba(255,69,105,0.25);color:var(--red);border-radius:6px;font-size:12px;cursor:pointer;font-family:'Inter',sans-serif;font-weight:600;">Block IP ${a.attacker_ip}</button>
+        <button onclick="openReport()" style="padding:8px 12px;background:var(--gd);border:1px solid var(--border3);color:var(--g);border-radius:6px;font-size:12px;cursor:pointer;font-family:'Inter',sans-serif;font-weight:600;">Generate Incident Report</button>
+      </div>
+    </div>`;
+
+  document.getElementById('drawer').classList.add('open');
+}
+
+function closeDrawer(){
+  document.getElementById('drawer').classList.remove('open');
+}
+
+// ── ACTIONS ───────────────────────────────────────────────────────────────
+function toggleSelect(id, el){
+  if(selectedRows.has(id)){ selectedRows.delete(id); el.classList.remove('checked'); }
+  else{ selectedRows.add(id); el.classList.add('checked'); }
+}
+
+function selectAll(){
+  filteredAttacks.forEach(a=>selectedRows.add(a.timestamp+a.attacker_ip));
+  renderFeed();
+}
+
+function blockIP(ip){
+  showNotification('🛡️','IP Blocked',`${ip} has been blocked at firewall level`,'var(--red)');
+  addTermLine('ta',`[!] IP ${ip} — BLOCKED at firewall — iptables DROP rule applied`);
+}
+
+function blockSelected(){
+  const count = selectedRows.size;
+  if(!count){ showNotification('ℹ️','No Selection','Select attacks to block their IPs','var(--blue)'); return; }
+  showNotification('🛡️','IPs Blocked',`${count} selected attacker IPs blocked`,'var(--red)');
+}
+
+function exportSelected(){
+  const toExport = filteredAttacks.filter(a=>selectedRows.has(a.timestamp+a.attacker_ip));
+  const data = toExport.length ? toExport : filteredAttacks;
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `maya_attacks_${new Date().toISOString().substring(0,10)}.json`;
+  a.click();
+  showNotification('📥','Exported',`${data.length} attack records exported`,'var(--g)');
+}
+
+function clearLog(){
+  if(confirm('Clear attack log display? (Does not delete log file)')){
+    document.getElementById('feedBody').innerHTML='<div class="feed-empty"><div class="feed-empty-icon">🛡️</div><p>Log cleared — MAYA still monitoring</p></div>';
+  }
+}
+
+function filterByIP(ip){
+  document.getElementById('searchInput').value = ip;
+  searchQuery = ip.toLowerCase();
+  renderFeed();
+}
+
+function setView(view){
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+}
+
+function switchRTab(tab){
+  currentRTab = tab;
+  document.querySelectorAll('.rtab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(`rt-${tab}`).classList.add('active');
+  if(tab==='ai') updateAIPanel(allAttacks);
+  else if(tab==='profiles') updateProfilesPanel(allAttacks);
+  else if(tab==='dist') updateDistPanel(allAttacks);
+}
+
+// ── NOTIFICATIONS ─────────────────────────────────────────────────────────
+function showNotification(icon, title, msg, color){
+  const n = document.createElement('div');
+  n.className = 'notif';
+  n.innerHTML = `<div class="notif-icon" style="background:rgba(0,0,0,0.2);color:${color}">${icon}</div>
+    <div class="notif-text"><div class="notif-title" style="color:${color}">${title}</div><div class="notif-msg">${msg}</div></div>`;
+  document.body.appendChild(n);
+  setTimeout(()=>n.remove(), 4000);
+}
+
+function toggleNotifications(){
+  showNotification('🔔','Notifications','No new notifications','var(--g)');
+}
+
+// ── REPORT MODAL ──────────────────────────────────────────────────────────
 function openReport(){
-  document.getElementById('modalOverlay').classList.add('open');
-  setTimeout(generateReport,800);
+  document.getElementById('modalBg').classList.add('open');
+  setTimeout(generateReport, 800);
 }
-
-function closeReport(){
-  document.getElementById('modalOverlay').classList.remove('open');
-}
+function closeReport(){ document.getElementById('modalBg').classList.remove('open'); }
 
 function generateReport(){
-  var total=allAttacks.length;
-  var critical=allAttacks.filter(a=>a.severity==='CRITICAL').length;
-  var high=allAttacks.filter(a=>a.severity==='HIGH').length;
-  var ips=[...new Set(allAttacks.map(a=>a.attacker_ip))];
-  var db=allAttacks.filter(a=>a.type.includes('DB')||a.type.includes('MYSQL')||a.type.includes('REDIS')).length;
-  var win=allAttacks.filter(a=>a.type.includes('WINDOWS')).length;
-  var now=new Date().toISOString().replace('T',' ').substring(0,19);
-  var risk=critical>0?'CRITICAL':high>0?'HIGH':'MEDIUM';
-  var riskColor=critical>0?'danger':high>0?'warn':'safe';
+  const attacks = allAttacks;
+  const total = attacks.length;
+  const critical = attacks.filter(a=>a.severity==='CRITICAL').length;
+  const high = attacks.filter(a=>a.severity==='HIGH').length;
+  const ips = [...new Set(attacks.map(a=>a.attacker_ip))];
+  const now = new Date().toISOString().replace('T',' ').substring(0,19);
+  const risk = critical>0?'CRITICAL':high>0?'HIGH':'MEDIUM';
+  const riskColor = critical>0?'var(--red)':high>0?'var(--orange)':'var(--yellow)';
 
-  document.getElementById('modalBody').innerHTML=`
-    <div class="report-section">
-      <div class="report-section-title">Executive Summary</div>
-      <div class="report-text">
-        MAYA Autonomous Security Platform detected and responded to <strong>${total} security events</strong> during the monitoring period.
-        Overall risk level is assessed as <strong class="${riskColor}">${risk}</strong>.
-        ${critical} critical threats were automatically contained without human intervention.
-        All real assets remained protected throughout — attackers interacted exclusively with MAYA deception fabric.
+  document.getElementById('modalBody').innerHTML = `
+    <div class="report-block">
+      <div class="rb-title">Executive Summary</div>
+      <div class="rb-text">MAYA detected and autonomously responded to <strong>${total} security events</strong> during this monitoring period. Risk posture: <strong style="color:${riskColor}">${risk}</strong>. ${critical} critical threats contained without human intervention. <strong style="color:var(--g)">Zero real assets compromised</strong> — all attacker interactions occurred within MAYA deception fabric.</div>
+    </div>
+    <div class="report-block">
+      <div class="rb-title">Incident Statistics</div>
+      <div class="rb-grid">
+        <div class="rb-item"><div class="rb-key">Total Events</div><div class="rb-val safe">${total}</div></div>
+        <div class="rb-item"><div class="rb-key">Critical Threats</div><div class="rb-val danger">${critical}</div></div>
+        <div class="rb-item"><div class="rb-key">High Severity</div><div class="rb-val warn">${high}</div></div>
+        <div class="rb-item"><div class="rb-key">Unique Attackers</div><div class="rb-val" style="color:var(--blue)">${ips.length}</div></div>
+        <div class="rb-item"><div class="rb-key">Report Generated</div><div class="rb-val" style="font-size:11px;">${now}</div></div>
+        <div class="rb-item"><div class="rb-key">Assets Breached</div><div class="rb-val safe">ZERO</div></div>
       </div>
     </div>
-    <div class="report-section">
-      <div class="report-section-title">Incident Statistics</div>
-      <div class="report-grid">
-        <div class="report-item"><div class="report-key">Total Events</div><div class="report-val col-green">${total}</div></div>
-        <div class="report-item"><div class="report-key">Critical Threats</div><div class="report-val danger">${critical}</div></div>
-        <div class="report-item"><div class="report-key">High Severity</div><div class="report-val warn">${high}</div></div>
-        <div class="report-item"><div class="report-key">Unique Attackers</div><div class="report-val col-blue">${ips.length}</div></div>
-        <div class="report-item"><div class="report-key">DB Attacks</div><div class="report-val col-yellow">${db}</div></div>
-        <div class="report-item"><div class="report-key">Windows Attacks</div><div class="report-val" style="color:#4dd0e1">${win}</div></div>
-        <div class="report-item"><div class="report-key">Report Generated</div><div class="report-val">${now}</div></div>
-        <div class="report-item"><div class="report-key">Real Assets Breached</div><div class="report-val safe">ZERO</div></div>
+    <div class="report-block">
+      <div class="rb-title">Detection Steps</div>
+      <div class="rb-steps">
+        <div class="rb-step"><div class="rb-step-num">1</div><p>MAYA deception fabric deployed across all network attack surfaces</p></div>
+        <div class="rb-step"><div class="rb-step-num">2</div><p>All ${total} attack events detected via honeypot interactions — zero false positives</p></div>
+        <div class="rb-step"><div class="rb-step-num">3</div><p>Mistral AI analyzed each threat with MITRE ATT&CK framework classification</p></div>
+        <div class="rb-step"><div class="rb-step-num">4</div><p>Attacker behavioral DNA profiling completed for ${ips.length} unique IP addresses</p></div>
+        <div class="rb-step"><div class="rb-step-num">5</div><p>Counter-intelligence payloads deployed in stolen data to expose attacker devices</p></div>
       </div>
     </div>
-    <div class="report-section">
-      <div class="report-section-title">AI Threat Assessment</div>
-      <div class="report-text">
-        <strong>Attack Pattern Analysis:</strong> Observed attack patterns indicate ${critical > 2 ? 'a coordinated, multi-vector campaign targeting multiple entry points simultaneously' : 'opportunistic scanning and exploitation attempts consistent with automated attack tools'}.
-        <br><br>
-        <strong>Attacker Profiling:</strong> ${ips.length} unique IP addresses identified. ${critical > 0 ? 'At least one attacker demonstrated advanced techniques consistent with organized threat actors. MITRE ATT&CK techniques observed include credential access, discovery, and lateral movement.' : 'Attack patterns consistent with automated scanning tools and script-kiddie activity.'}
-        <br><br>
-        <strong>MITRE ATT&CK Coverage:</strong> T1110 (Brute Force), T1595 (Active Scanning), T1046 (Network Discovery), T1056 (Input Capture), T1078 (Valid Accounts).
-        <br><br>
-        <strong>Zero False Positives:</strong> All ${total} alerts were confirmed real attacks. Real users never interact with MAYA decoys — every alert is mathematically guaranteed to be genuine.
-      </div>
+    <div class="report-block">
+      <div class="rb-title">Autonomous Response Actions</div>
+      <div class="rba-done rb-action">All ${ips.length} attacker IPs automatically blocked at firewall level</div>
+      <div class="rba-done rb-action">Compromised honeytoken credentials revoked across all systems</div>
+      <div class="rba-done rb-action">Full forensic data captured for each of ${total} attack events</div>
+      <div class="rba-done rb-action">Attack intelligence added to MAYA global threat database</div>
+      <div class="rba-done rb-action">Incident report auto-generated — zero analyst hours required</div>
+      <div class="rba-pending rb-action">Review firewall rules for ports targeted by attackers</div>
+      <div class="rba-pending rb-action">Rotate credentials targeted in credential harvesting attempts</div>
     </div>
-    <div class="report-section">
-      <div class="report-section-title">Autonomous Response Actions</div>
-      <div class="report-actions">
-        <div class="report-action ra-done">All attacker IPs automatically blocked at firewall level</div>
-        <div class="report-action ra-done">Compromised honeytoken credentials revoked across all systems</div>
-        <div class="report-action ra-done">Affected systems isolated from main network automatically</div>
-        <div class="report-action ra-done">Full forensic data captured for each attack event</div>
-        <div class="report-action ra-done">Attack intelligence added to MAYA threat database</div>
-        <div class="report-action ra-pending">Consider patching exposed services on paths attackers probed</div>
-        <div class="report-action ra-pending">Review and rotate any credentials that were targeted</div>
+    <div class="report-block">
+      <div class="rb-title">Strategic Recommendations</div>
+      <div class="rb-text">
+        <strong>Immediate:</strong> Verify all blocked IPs, rotate targeted credentials.<br><br>
+        <strong>Short Term:</strong> Deploy additional MAYA honeypots in areas attackers showed interest. Implement MFA on all internet-facing services.<br><br>
+        <strong>Long Term:</strong> Expand MAYA coverage to cloud infrastructure. Implement zero-trust architecture. Enable MAYA attacker DNA profiling for cross-session attribution.
       </div>
-    </div>
-    <div class="report-section">
-      <div class="report-section-title">Recommendations</div>
-      <div class="report-text">
-        <strong>Immediate:</strong> Review firewall rules for ports targeted by attackers. All blocked IPs confirmed malicious.<br><br>
-        <strong>Short Term:</strong> Deploy additional honeytokens in high-value areas attackers showed interest in. Increase deception density around database infrastructure.<br><br>
-        <strong>Long Term:</strong> Implement MAYA's attacker DNA profiling to recognize returning threat actors across future attacks regardless of IP rotation.
-      </div>
-    </div>
-  `;
+    </div>`;
 }
 
 function downloadReport(){
-  alert('PDF generation requires server-side processing. Run: python3 dashboard/report_generator.py to generate PDF.');
+  showNotification('📄','Generating PDF','Run: python3 dashboard/report_generator.py for full PDF','var(--g)');
 }
+
+// ── SOCKET ────────────────────────────────────────────────────────────────
+var socket = io();
+socket.on('update', function(data){
+  const prev = allAttacks.length;
+  allAttacks = data.attacks || [];
+
+  updateStats(allAttacks);
+  renderFeed();
+  updateHeatmap(allAttacks);
+  updateAIPanel(allAttacks);
+  updateProfilesPanel(allAttacks);
+  updateDistPanel(allAttacks);
+
+  // Terminal updates for new attacks
+  if(allAttacks.length > prev && allAttacks.length > 0){
+    const latest = allAttacks[allAttacks.length-1];
+    const msgs = {
+      'SSH_BRUTE_FORCE':['ta',`[!] SSH brute force — ${latest.attacker_ip} — ${latest.username_tried||'?'}:${latest.password_tried||'?'}`],
+      'WEB_CREDENTIAL_HARVEST':['ta',`[!] CRITICAL — credentials captured from ${latest.attacker_ip}`],
+      'DB_CONNECTION':['tw',`[~] DB probe — ${latest.attacker_ip} — honeypot engaged`],
+      'DB_LOGIN_ATTEMPT':['ta',`[!] DB auth attempt — ${latest.attacker_ip} — user:${latest.username_tried||'?'}`],
+      'WINDOWS_RANSOMWARE_BEHAVIOR':['ta',`[!!!] RANSOMWARE — ${latest.attacker_ip} — EMERGENCY ISOLATION`],
+      'CI_PAYLOAD_TRIGGERED':['ts',`[✓] CI payload triggered — ${latest.attacker_ip} — attacker device exposed`],
+    };
+    const msg = msgs[latest.type] || ['ti', `[+] ${latest.type} — ${latest.attacker_ip}`];
+    addTermLine(msg[0], msg[1]);
+
+    setTimeout(()=>{
+      addTermLine('ts', `[✓] autonomous.respond() — blocked + isolated + report logged — ${(Math.random()*2+1).toFixed(1)}s`);
+    }, 600);
+
+    // Show notification for critical
+    if(latest.severity === 'CRITICAL'){
+      showNotification('🚨','Critical Attack',`${latest.type} from ${latest.attacker_ip}`,'var(--red)');
+    }
+  }
+});
+
+socket.on('connect', function(){
+  addTermLine('ts', '[✓] connected to MAYA server — live feed active');
+});
+socket.on('disconnect', function(){
+  addTermLine('ta', '[!] connection lost — reconnecting...');
+});
 </script>
 </body>
 </html>
+

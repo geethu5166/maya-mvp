@@ -1,0 +1,3 @@
+id,name,email,salary
+1,John Smith,j.smith@company.com,85000
+2,Sarah Jones,s.jones@company.com,92000

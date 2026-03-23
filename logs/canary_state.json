@@ -1,0 +1,57 @@
+{
+  "/home/kali/maya-mvp/honeypot/canary_files/AAA_DO_NOT_DELETE_SECURITY.txt": {
+    "original_state": {
+      "hash": "46bba3fc2769fde12043df57954a3415",
+      "size": 110,
+      "mtime": 1774243756.8162522,
+      "exists": true
+    },
+    "description": "Text canary \u2014 first target for ransomware",
+    "created_at": "2026-03-23T10:58:56.800679",
+    "alert_count": 1
+  },
+  "/home/kali/maya-mvp/honeypot/canary_files/AAA_Financial_Report_Q4.docx.txt": {
+    "original_state": {
+      "hash": "9272081c9ade625d2411bbba322b9d88",
+      "size": 99,
+      "mtime": 1774243736.801348,
+      "exists": true
+    },
+    "description": "Fake financial document canary",
+    "created_at": "2026-03-23T10:58:56.801429",
+    "alert_count": 0
+  },
+  "/home/kali/maya-mvp/honeypot/canary_files/AAA_Employee_Database.csv.txt": {
+    "original_state": {
+      "hash": "f27d4ba3b773b7286c1068ea31aa0b04",
+      "size": 100,
+      "mtime": 1774243736.8015635,
+      "exists": true
+    },
+    "description": "Fake employee data canary",
+    "created_at": "2026-03-23T10:58:56.801607",
+    "alert_count": 0
+  },
+  "/home/kali/maya-mvp/honeypot/canary_files/AAA_backup_credentials.txt": {
+    "original_state": {
+      "hash": "46342d77526398360c70329e0d264e20",
+      "size": 89,
+      "mtime": 1774243736.8016555,
+      "exists": true
+    },
+    "description": "Fake credentials canary",
+    "created_at": "2026-03-23T10:58:56.801686",
+    "alert_count": 0
+  },
+  "/home/kali/maya-mvp/honeypot/canary_files/AAA_customer_data_export.txt": {
+    "original_state": {
+      "hash": "55aa90b17fade66a6ab43681339c59f5",
+      "size": 88,
+      "mtime": 1774243736.8018098,
+      "exists": true
+    },
+    "description": "Fake customer data canary",
+    "created_at": "2026-03-23T10:58:56.801848",
+    "alert_count": 0
+  }
+}

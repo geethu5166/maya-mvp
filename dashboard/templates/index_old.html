@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAYA — Vaultrap Security Operations Center</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=JetBrains+Mono:wght@300;400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+--g:#00ff88;--g2:#00c896;--gd:rgba(0,255,136,0.08);
+--dark:#040608;--dark2:#080d12;--dark3:#0c1219;--dark4:#101820;
+--border:rgba(0,255,136,0.12);--border2:rgba(0,255,136,0.06);
+--text:#e8f0e8;--muted:#3a5050;--muted2:#4a6060;
+--red:#ff3366;--orange:#ff8800;--blue:#0088ff;--yellow:#ffcc00;--purple:#9c27b0;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;}
+body{font-family:'JetBrains Mono',monospace;background:var(--dark);color:var(--text);display:flex;flex-direction:column;}
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.025) 2px,rgba(0,0,0,0.025) 4px);pointer-events:none;z-index:9999;}
+
+/* TOPBAR */
+.topbar{height:52px;background:var(--dark2);border-bottom:1px solid var(--border2);display:flex;align-items:center;padding:0 20px;gap:20px;flex-shrink:0;}
+.logo{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;letter-spacing:3px;display:flex;align-items:center;gap:8px;color:var(--text);}
+.logo-icon{width:22px;height:22px;border:1px solid var(--g);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.logo-icon::before{content:'';width:8px;height:8px;background:var(--g);clip-path:polygon(50% 0%,100% 100%,0% 100%);animation:spin 4s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.logo .v{color:var(--g);}
+.topbar-divider{width:1px;height:20px;background:var(--border2);}
+.topbar-info{font-size:10px;color:var(--muted2);letter-spacing:1px;}
+.topbar-info span{color:var(--g);}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:16px;}
+.live-indicator{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--g);letter-spacing:1px;}
+.live-dot{width:6px;height:6px;background:var(--g);border-radius:50%;animation:pulse 1s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.2}}
+.clock{font-size:11px;color:var(--muted2);font-family:'Space Mono',monospace;}
+.report-btn{padding:6px 16px;border:1px solid var(--g);background:transparent;color:var(--g);font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden;}
+.report-btn::before{content:'';position:absolute;inset:0;background:var(--g);transform:translateX(-101%);transition:transform 0.2s;}
+.report-btn:hover{color:var(--dark);}
+.report-btn:hover::before{transform:translateX(0);}
+.report-btn span{position:relative;z-index:1;}
+
+/* STATS ROW */
+.stats-row{display:grid;grid-template-columns:repeat(8,1fr);gap:1px;background:var(--border2);flex-shrink:0;border-bottom:1px solid var(--border2);}
+.stat-cell{background:var(--dark);padding:12px 16px;position:relative;cursor:default;}
+.stat-cell::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:var(--g);transform:scaleX(0);transform-origin:left;transition:transform 0.3s;}
+.stat-cell:hover::after{transform:scaleX(1);}
+.stat-cell:hover{background:var(--dark2);}
+.stat-num{font-family:'Space Mono',monospace;font-size:20px;font-weight:700;display:block;line-height:1;}
+.stat-label{font-size:9px;color:var(--muted2);text-transform:uppercase;letter-spacing:1px;margin-top:4px;display:block;}
+.col-green{color:var(--g);}
+.col-red{color:var(--red);}
+.col-orange{color:var(--orange);}
+.col-blue{color:var(--blue);}
+.col-yellow{color:var(--yellow);}
+.col-purple{color:#ce93d8;}
+
+/* MAIN LAYOUT */
+.main-layout{flex:1;display:grid;grid-template-columns:1fr 320px;grid-template-rows:1fr 240px;gap:1px;background:var(--border2);overflow:hidden;min-height:0;}
+
+/* FEED PANEL */
+.feed-panel{background:var(--dark);display:flex;flex-direction:column;overflow:hidden;}
+.panel-header{padding:10px 16px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.panel-title{font-size:9px;color:var(--g);letter-spacing:3px;text-transform:uppercase;display:flex;align-items:center;gap:8px;}
+.panel-title::before{content:'';width:16px;height:1px;background:var(--g);}
+.panel-count{font-size:9px;color:var(--muted2);letter-spacing:1px;}
+.feed-header{display:grid;grid-template-columns:130px 120px 190px 90px 1fr;padding:8px 16px;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid var(--border2);background:var(--dark2);flex-shrink:0;}
+.feed-body{flex:1;overflow-y:auto;min-height:0;}
+.feed-body::-webkit-scrollbar{width:2px;}
+.feed-body::-webkit-scrollbar-thumb{background:var(--g);}
+.feed-row{display:grid;grid-template-columns:130px 120px 190px 90px 1fr;padding:8px 16px;font-size:10px;border-bottom:1px solid rgba(0,255,136,0.03);transition:background 0.15s;align-items:center;animation:rowIn 0.3s ease;}
+@keyframes rowIn{from{opacity:0;background:rgba(0,255,136,0.05);}to{opacity:1;background:transparent;}}
+.feed-row:hover{background:var(--dark3);}
+.col-time{color:var(--muted);font-size:9px;}
+.col-ip{color:var(--blue);font-family:'Space Mono',monospace;font-size:10px;}
+.type-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 7px;border-radius:2px;font-size:9px;font-weight:700;letter-spacing:0.5px;border:1px solid;}
+.t-SSH{color:#42a5f5;border-color:rgba(66,165,245,0.4);background:rgba(66,165,245,0.06);}
+.t-WEB{color:#ce93d8;border-color:rgba(206,147,216,0.4);background:rgba(206,147,216,0.06);}
+.t-DB{color:#ffb74d;border-color:rgba(255,183,77,0.4);background:rgba(255,183,77,0.06);}
+.t-WIN{color:#4dd0e1;border-color:rgba(77,208,225,0.4);background:rgba(77,208,225,0.06);}
+.t-OTHER{color:#90a4ae;border-color:rgba(144,164,174,0.4);background:rgba(144,164,174,0.06);}
+.sev-badge{display:inline-block;padding:2px 7px;border-radius:2px;font-size:9px;font-weight:700;letter-spacing:0.5px;}
+.s-CRITICAL{background:rgba(255,51,102,0.12);color:var(--red);border:1px solid rgba(255,51,102,0.3);}
+.s-HIGH{background:rgba(255,136,0,0.12);color:var(--orange);border:1px solid rgba(255,136,0,0.3);}
+.s-MEDIUM{background:rgba(255,204,0,0.12);color:var(--yellow);border:1px solid rgba(255,204,0,0.3);}
+.s-LOW{background:rgba(0,255,136,0.08);color:var(--g);border:1px solid rgba(0,255,136,0.2);}
+.col-detail{color:var(--muted2);font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.feed-empty{padding:40px;text-align:center;color:var(--muted);font-size:11px;}
+
+/* RIGHT PANEL */
+.right-panel{background:var(--dark2);display:flex;flex-direction:column;overflow:hidden;border-left:1px solid var(--border2);}
+.right-section{border-bottom:1px solid var(--border2);flex-shrink:0;}
+.right-section:last-child{border:none;flex:1;overflow:hidden;}
+
+/* THREAT DIST */
+.dist-grid{padding:12px 16px;}
+.dist-row{margin-bottom:10px;}
+.dist-label{display:flex;justify-content:space-between;font-size:10px;color:var(--muted2);margin-bottom:4px;}
+.dist-label span:last-child{color:var(--text);}
+.dist-track{height:3px;background:var(--border2);border-radius:1px;overflow:hidden;}
+.dist-fill{height:100%;border-radius:1px;transition:width 0.5s ease;}
+
+/* AI ANALYSIS */
+.ai-panel{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.ai-body{flex:1;overflow-y:auto;padding:12px 16px;font-size:11px;line-height:1.7;}
+.ai-body::-webkit-scrollbar{width:2px;}
+.ai-body::-webkit-scrollbar-thumb{background:var(--g);}
+.ai-thinking{display:flex;align-items:center;gap:8px;color:var(--muted2);font-size:10px;}
+.ai-dots span{animation:dot 1.4s infinite;}
+.ai-dots span:nth-child(2){animation-delay:0.2s;}
+.ai-dots span:nth-child(3){animation-delay:0.4s;}
+@keyframes dot{0%,60%,100%{opacity:0.3}30%{opacity:1}}
+.ai-entry{margin-bottom:12px;padding:10px 12px;border-left:2px solid var(--g);background:rgba(0,255,136,0.03);}
+.ai-entry-header{font-size:9px;color:var(--g);letter-spacing:1px;margin-bottom:6px;text-transform:uppercase;}
+.ai-entry-text{font-size:11px;color:var(--muted2);line-height:1.7;}
+.ai-entry-text strong{color:var(--text);}
+.ai-entry.critical{border-left-color:var(--red);background:rgba(255,51,102,0.03);}
+.ai-entry.critical .ai-entry-header{color:var(--red);}
+.ai-entry.high{border-left-color:var(--orange);background:rgba(255,136,0,0.03);}
+.ai-entry.high .ai-entry-header{color:var(--orange);}
+
+/* BOTTOM PANELS */
+.bottom-left{background:var(--dark);display:flex;flex-direction:column;overflow:hidden;}
+.bottom-right{background:var(--dark2);display:flex;flex-direction:column;overflow:hidden;border-left:1px solid var(--border2);}
+
+/* ATTACKER TABLE */
+.attacker-table{flex:1;overflow-y:auto;min-height:0;}
+.attacker-table::-webkit-scrollbar{width:2px;}
+.attacker-table::-webkit-scrollbar-thumb{background:var(--g);}
+.att-row{display:grid;grid-template-columns:120px 140px 100px 80px 1fr;padding:7px 16px;font-size:10px;border-bottom:1px solid rgba(0,255,136,0.03);transition:background 0.15s;align-items:center;}
+.att-row:hover{background:var(--dark2);}
+.att-header{background:var(--dark2);color:var(--muted);font-size:9px;text-transform:uppercase;letter-spacing:1px;}
+
+/* TERMINAL */
+.terminal-body{flex:1;overflow-y:auto;padding:12px 16px;min-height:0;}
+.terminal-body::-webkit-scrollbar{width:2px;}
+.terminal-body::-webkit-scrollbar-thumb{background:var(--g);}
+.t-line{font-size:10px;line-height:1.8;display:flex;gap:8px;}
+.t-prompt{color:var(--g);opacity:0.5;flex-shrink:0;}
+.t-success{color:var(--g);}
+.t-alert{color:var(--red);}
+.t-warn{color:var(--orange);}
+.t-info{color:var(--muted2);}
+.t-cursor-blink{display:inline-block;width:7px;height:12px;background:var(--g);animation:blink 1s infinite;vertical-align:middle;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0;}}
+
+/* AI REPORT MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(4,6,8,0.92);z-index:10000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+.modal-overlay.open{display:flex;}
+.modal{width:min(700px,90vw);max-height:85vh;background:var(--dark2);border:1px solid var(--border);display:flex;flex-direction:column;}
+.modal-header{padding:16px 20px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.modal-title{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:var(--g);letter-spacing:2px;}
+.modal-close{background:none;border:1px solid var(--border);color:var(--muted2);font-family:'JetBrains Mono',monospace;font-size:11px;padding:4px 12px;cursor:pointer;letter-spacing:1px;transition:all 0.2s;}
+.modal-close:hover{border-color:var(--red);color:var(--red);}
+.modal-body{flex:1;overflow-y:auto;padding:20px;}
+.modal-body::-webkit-scrollbar{width:4px;}
+.modal-body::-webkit-scrollbar-thumb{background:var(--g);}
+.report-section{margin-bottom:24px;}
+.report-section-title{font-size:9px;color:var(--g);letter-spacing:3px;text-transform:uppercase;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border2);display:flex;align-items:center;gap:8px;}
+.report-section-title::before{content:'';width:16px;height:1px;background:var(--g);}
+.report-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.report-item{background:var(--dark);padding:10px 14px;border-left:1px solid var(--border2);}
+.report-key{font-size:9px;color:var(--muted2);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;}
+.report-val{font-size:12px;color:var(--text);}
+.report-val.danger{color:var(--red);}
+.report-val.warn{color:var(--orange);}
+.report-val.safe{color:var(--g);}
+.report-text{font-size:12px;color:var(--muted2);line-height:1.8;background:var(--dark);padding:14px;border-left:2px solid var(--g);}
+.report-actions{display:flex;flex-direction:column;gap:6px;}
+.report-action{padding:8px 12px;font-size:11px;display:flex;align-items:center;gap:8px;}
+.ra-done{background:rgba(0,255,136,0.05);border:1px solid rgba(0,255,136,0.15);color:var(--g);}
+.ra-done::before{content:'✓';}
+.ra-pending{background:rgba(255,136,0,0.05);border:1px solid rgba(255,136,0,0.15);color:var(--orange);}
+.ra-pending::before{content:'→';}
+.modal-footer{padding:12px 20px;border-top:1px solid var(--border2);display:flex;gap:10px;flex-shrink:0;}
+.modal-btn{padding:8px 20px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all 0.2s;border:1px solid var(--border);background:transparent;color:var(--muted2);}
+.modal-btn:hover{border-color:var(--g);color:var(--g);}
+.modal-btn.primary{background:var(--g);color:var(--dark);border-color:var(--g);}
+.modal-btn.primary:hover{background:var(--g2);}
+.generating{display:flex;align-items:center;gap:8px;color:var(--g);font-size:11px;padding:20px;}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo">
+    <div class="logo-icon"></div>
+    <span><span class="v">VAULT</span>RAP / MAYA SOC</span>
+  </div>
+  <div class="topbar-divider"></div>
+  <div class="topbar-info">Platform v2.0 — <span>Autonomous Deception Active</span></div>
+  <div class="topbar-divider"></div>
+  <div class="topbar-info">AI Brain: <span>Mistral 7B</span></div>
+  <div class="topbar-divider"></div>
+  <div class="topbar-info">Honeypots: <span>SSH + WEB + DB + WINDOWS</span></div>
+  <div class="topbar-right">
+    <div class="live-indicator"><div class="live-dot"></div>LIVE</div>
+    <div class="clock" id="clock">--:--:-- UTC</div>
+    <button class="report-btn" onclick="openReport()"><span>Generate AI Report</span></button>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats-row">
+  <div class="stat-cell"><span class="stat-num col-green" id="s-total">0</span><span class="stat-label">Total Attacks</span></div>
+  <div class="stat-cell"><span class="stat-num col-red" id="s-critical">0</span><span class="stat-label">Critical</span></div>
+  <div class="stat-cell"><span class="stat-num col-orange" id="s-high">0</span><span class="stat-label">High</span></div>
+  <div class="stat-cell"><span class="stat-num col-blue" id="s-ips">0</span><span class="stat-label">Unique IPs</span></div>
+  <div class="stat-cell"><span class="stat-num col-green" id="s-ssh">0</span><span class="stat-label">SSH</span></div>
+  <div class="stat-cell"><span class="stat-num col-purple" id="s-web">0</span><span class="stat-label">Web</span></div>
+  <div class="stat-cell"><span class="stat-num col-yellow" id="s-db">0</span><span class="stat-label">Database</span></div>
+  <div class="stat-cell"><span class="stat-num" id="s-win" style="color:#4dd0e1;">0</span><span class="stat-label">Windows</span></div>
+</div>
+
+<!-- MAIN -->
+<div class="main-layout">
+
+  <!-- FEED -->
+  <div class="feed-panel">
+    <div class="panel-header">
+      <div class="panel-title">Live Attack Feed</div>
+      <div class="panel-count" id="feed-count">0 events</div>
+    </div>
+    <div class="feed-header">
+      <span>Timestamp</span>
+      <span>Attacker IP</span>
+      <span>Attack Type</span>
+      <span>Severity</span>
+      <span>Intelligence</span>
+    </div>
+    <div class="feed-body" id="feedBody">
+      <div class="feed-empty">MAYA deception fabric active — waiting for attackers...</div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+    <div class="right-section">
+      <div class="panel-header"><div class="panel-title">Attack Distribution</div></div>
+      <div class="dist-grid">
+        <div class="dist-row">
+          <div class="dist-label"><span>SSH Brute Force</span><span id="d-ssh">0</span></div>
+          <div class="dist-track"><div class="dist-fill" id="df-ssh" style="width:0%;background:var(--blue)"></div></div>
+        </div>
+        <div class="dist-row">
+          <div class="dist-label"><span>Web Attacks</span><span id="d-web">0</span></div>
+          <div class="dist-track"><div class="dist-fill" id="df-web" style="width:0%;background:#ce93d8"></div></div>
+        </div>
+        <div class="dist-row">
+          <div class="dist-label"><span>Database Attacks</span><span id="d-db">0</span></div>
+          <div class="dist-track"><div class="dist-fill" id="df-db" style="width:0%;background:var(--orange)"></div></div>
+        </div>
+        <div class="dist-row">
+          <div class="dist-label"><span>Windows Agent</span><span id="d-win">0</span></div>
+          <div class="dist-track"><div class="dist-fill" id="df-win" style="width:0%;background:#4dd0e1"></div></div>
+        </div>
+        <div class="dist-row">
+          <div class="dist-label"><span>Critical Severity</span><span id="d-crit">0</span></div>
+          <div class="dist-track"><div class="dist-fill" id="df-crit" style="width:0%;background:var(--red)"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="right-section ai-panel">
+      <div class="panel-header"><div class="panel-title">Mistral AI Analysis</div></div>
+      <div class="ai-body" id="aiBody">
+        <div class="ai-thinking">
+          <span>AI brain initializing</span>
+          <div class="ai-dots"><span>.</span><span>.</span><span>.</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM LEFT -->
+  <div class="bottom-left">
+    <div class="panel-header">
+      <div class="panel-title">Attacker Intelligence</div>
+    </div>
+    <div class="att-row att-header">
+      <span>IP Address</span>
+      <span>Attack Type</span>
+      <span>Severity</span>
+      <span>Count</span>
+      <span>Last Seen</span>
+    </div>
+    <div class="attacker-table" id="attackerTable">
+      <div class="feed-empty">No attackers profiled yet</div>
+    </div>
+  </div>
+
+  <!-- BOTTOM RIGHT - TERMINAL -->
+  <div class="bottom-right">
+    <div class="panel-header"><div class="panel-title">MAYA Response Terminal</div></div>
+    <div class="terminal-body" id="termBody">
+      <div class="t-line"><span class="t-prompt">maya@soc:~$</span><span class="t-info"> system.initialize() — all honeypots active</span></div>
+      <div class="t-line"><span class="t-prompt">maya@soc:~$</span><span class="t-success"> deception_fabric.deploy() — 312 decoys live</span></div>
+      <div class="t-line"><span class="t-prompt">maya@soc:~$</span><span class="t-success"> mistral_ai.load() — brain ready</span></div>
+      <div class="t-line"><span class="t-prompt">maya@soc:~$</span><span class="t-info"> monitoring.start() — watching all attack surfaces</span></div>
+      <div class="t-line"><span class="t-prompt">maya@soc:~$</span><span class="t-cursor-blink"></span></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- AI REPORT MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">AI INCIDENT REPORT</div>
+      <button class="modal-close" onclick="closeReport()">✕ CLOSE</button>
+    </div>
+    <div class="modal-body" id="modalBody">
+      <div class="generating">
+        <div class="live-dot"></div>
+        Mistral AI generating comprehensive incident report...
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-btn primary" onclick="downloadReport()"><span>Download PDF</span></button>
+      <button class="modal-btn" onclick="closeReport()">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Clock
+function updateClock(){
+  const n=new Date();
+  document.getElementById('clock').textContent=n.toISOString().replace('T',' ').substring(0,19)+' UTC';
+}
+updateClock();setInterval(updateClock,1000);
+
+// State
+let allAttacks=[];
+let attackerMap={};
+
+// Socket
+var socket=io();
+socket.on('update',function(data){
+  updateStats(data.stats);
+  allAttacks=data.attacks;
+  renderFeed(data.attacks);
+  updateDistribution(data.attacks,data.stats);
+  updateAttackerTable(data.attacks);
+  updateAI(data.attacks);
+  updateTerminal(data.attacks);
+});
+
+function updateStats(s){
+  document.getElementById('s-total').textContent=s.total||0;
+  document.getElementById('s-critical').textContent=s.critical||0;
+  document.getElementById('s-high').textContent=s.high||0;
+  document.getElementById('s-ips').textContent=s.unique_ips||0;
+  document.getElementById('s-ssh').textContent=s.ssh||0;
+  document.getElementById('s-web').textContent=s.web||0;
+  var db=0,win=0;
+  // count from attacks if available
+  document.getElementById('s-db').textContent=db;
+  document.getElementById('s-win').textContent=win;
+}
+
+function getTypeClass(type){
+  if(type.includes('SSH')) return 't-SSH';
+  if(type.includes('WEB')) return 't-WEB';
+  if(type.includes('DB')||type.includes('MYSQL')||type.includes('REDIS')||type.includes('POSTGRES')) return 't-DB';
+  if(type.includes('WINDOWS')) return 't-WIN';
+  return 't-OTHER';
+}
+
+function getDetail(a){
+  if(a.type==='SSH_BRUTE_FORCE') return 'user:'+( a.username_tried||'?')+' pass:'+(a.password_tried||'?');
+  if(a.type==='WEB_CREDENTIAL_HARVEST') return 'credentials:'+(a.credentials||'?').substring(0,30);
+  if(a.type.includes('DB')||a.type.includes('MYSQL')) return 'user:'+(a.username_tried||'?')+' db:'+(a.database_target||'?');
+  if(a.type.includes('REDIS')) return 'cmd:'+(a.command||a.details||'N/A').toString().substring(0,35);
+  if(a.type.includes('WINDOWS')) return (a.details||'N/A').toString().substring(0,50);
+  return (a.details||a.path||a.credentials||'N/A').toString().substring(0,50);
+}
+
+function renderFeed(attacks){
+  var rev=[...attacks].reverse();
+  document.getElementById('feed-count').textContent=attacks.length+' events';
+  if(!rev.length){
+    document.getElementById('feedBody').innerHTML='<div class="feed-empty">MAYA deception fabric active — waiting for attackers...</div>';
+    return;
+  }
+  var html='';
+  rev.forEach(function(a){
+    var tc=getTypeClass(a.type);
+    var det=getDetail(a);
+    html+='<div class="feed-row">'+
+      '<span class="col-time">'+a.timestamp.substring(0,19).replace('T',' ')+'</span>'+
+      '<span class="col-ip">'+a.attacker_ip+'</span>'+
+      '<span><span class="type-badge '+tc+'">'+a.type+'</span></span>'+
+      '<span><span class="sev-badge s-'+a.severity+'">'+a.severity+'</span></span>'+
+      '<span class="col-detail">'+det+'</span>'+
+      '</div>';
+  });
+  document.getElementById('feedBody').innerHTML=html;
+}
+
+function updateDistribution(attacks,stats){
+  var total=Math.max(attacks.length,1);
+  var db=attacks.filter(a=>a.type.includes('DB')||a.type.includes('MYSQL')||a.type.includes('REDIS')).length;
+  var win=attacks.filter(a=>a.type.includes('WINDOWS')).length;
+  var ssh=stats.ssh||0;
+  var web=stats.web||0;
+  var crit=stats.critical||0;
+  document.getElementById('s-db').textContent=db;
+  document.getElementById('s-win').textContent=win;
+  document.getElementById('d-ssh').textContent=ssh;
+  document.getElementById('d-web').textContent=web;
+  document.getElementById('d-db').textContent=db;
+  document.getElementById('d-win').textContent=win;
+  document.getElementById('d-crit').textContent=crit;
+  document.getElementById('df-ssh').style.width=Math.min((ssh/total)*100,100)+'%';
+  document.getElementById('df-web').style.width=Math.min((web/total)*100,100)+'%';
+  document.getElementById('df-db').style.width=Math.min((db/total)*100,100)+'%';
+  document.getElementById('df-win').style.width=Math.min((win/total)*100,100)+'%';
+  document.getElementById('df-crit').style.width=Math.min((crit/total)*100,100)+'%';
+}
+
+function updateAttackerTable(attacks){
+  if(!attacks.length){
+    document.getElementById('attackerTable').innerHTML='<div class="feed-empty">No attackers profiled yet</div>';
+    return;
+  }
+  var ipMap={};
+  attacks.forEach(function(a){
+    var ip=a.attacker_ip;
+    if(!ipMap[ip]) ipMap[ip]={ip:ip,types:new Set(),severity:a.severity,count:0,last:a.timestamp};
+    ipMap[ip].count++;
+    ipMap[ip].types.add(a.type);
+    ipMap[ip].last=a.timestamp;
+    if(a.severity==='CRITICAL') ipMap[ip].severity='CRITICAL';
+    else if(a.severity==='HIGH'&&ipMap[ip].severity!=='CRITICAL') ipMap[ip].severity='HIGH';
+  });
+  var sorted=Object.values(ipMap).sort((a,b)=>b.count-a.count);
+  var html='';
+  sorted.forEach(function(att){
+    var types=[...att.types];
+    var tc=getTypeClass(types[0]||'OTHER');
+    html+='<div class="att-row">'+
+      '<span class="col-ip">'+att.ip+'</span>'+
+      '<span><span class="type-badge '+tc+'">'+( types[0]||'?').substring(0,18)+'</span></span>'+
+      '<span><span class="sev-badge s-'+att.severity+'">'+att.severity+'</span></span>'+
+      '<span style="color:var(--g);font-family:\'Space Mono\',monospace;">'+att.count+'</span>'+
+      '<span class="col-time">'+att.last.substring(11,19)+'</span>'+
+      '</div>';
+  });
+  document.getElementById('attackerTable').innerHTML=html;
+}
+
+var lastAiCount=0;
+function updateAI(attacks){
+  if(attacks.length===lastAiCount) return;
+  lastAiCount=attacks.length;
+  if(!attacks.length) return;
+
+  var latest=attacks[attacks.length-1];
+  var sev=latest.severity;
+  var cls=sev==='CRITICAL'?'critical':sev==='HIGH'?'high':'';
+
+  var analyses={
+    'SSH_BRUTE_FORCE':'Attacker is conducting systematic credential stuffing via SSH. Technique: <strong>T1110.001 — Brute Force: Password Guessing</strong>. Behavioral pattern suggests automated tooling (Hydra/Medusa). Predicted next move: privilege escalation if credentials succeed. MAYA has logged all attempted credentials for threat intelligence.',
+    'WEB_CREDENTIAL_HARVEST':'<strong>CRITICAL THREAT</strong> — Attacker is harvesting credentials through the fake web portal. Technique: <strong>T1056.003 — Web Portal Capture</strong>. This indicates a phishing or credential stuffing campaign. Attacker intent: account takeover of financial or admin systems. All captured credentials are honeytokens — attacker has gained nothing real.',
+    'WEB_RECON':'Attacker is in active reconnaissance phase. Technique: <strong>T1595.002 — Active Scanning</strong>. They are mapping your web attack surface looking for vulnerabilities, exposed admin panels, and configuration files. This is early-stage attack — detection before exploitation is optimal.',
+    'DB_CONNECTION':'Database infrastructure probe detected. Attacker is scanning for exposed database services. Technique: <strong>T1046 — Network Service Discovery</strong>. Target: credential access to database. MAYA fake database has engaged — attacker is now interacting with decoy data.',
+    'DB_LOGIN_ATTEMPT':'<strong>HIGH VALUE TARGET</strong> — Attacker has found the honeypot database and is attempting authentication. Technique: <strong>T1078 — Valid Accounts</strong>. They are using credential lists against database. All login attempts captured for analysis. Real database completely protected.',
+    'REDIS_PROBE':'Redis instance probe — attacker looking for unauthenticated Redis for data exfiltration or command execution. Technique: <strong>T1190 — Exploit Public-Facing Application</strong>. Commonly used in cryptojacking and lateral movement campaigns.',
+    'WINDOWS_RDP_BRUTE_FORCE':'<strong>CRITICAL</strong> — Windows RDP brute force detected. Technique: <strong>T1110.001</strong>. RDP compromise leads to full Windows domain access. Attacker likely part of ransomware group — RDP is primary initial access vector for ransomware operations globally.',
+    'WINDOWS_LATERAL_MOVEMENT':'<strong>CRITICAL</strong> — Active lateral movement detected. Technique: <strong>T1021 — Remote Services</strong>. Attacker has established initial foothold and is moving through the network. Immediate containment protocol activated.',
+    'WINDOWS_RANSOMWARE_BEHAVIOR':'<strong>CRITICAL RANSOMWARE ALERT</strong> — Mass file operation pattern detected consistent with ransomware pre-encryption staging. Technique: <strong>T1486 — Data Encrypted for Impact</strong>. MAYA has isolated affected systems. Incident response recommended immediately.',
+    'WINDOWS_HONEYTOKEN_TRIGGERED':'<strong>CONFIRMED ATTACKER IDENTIFIED</strong> — Honeytoken accessed. Attacker used fake admin credentials planted in decoy system. This confirms active insider threat or successful phishing. Full attacker behavioral profile captured.',
+  };
+
+  var analysis=analyses[latest.type]||'Unclassified attack pattern detected. MAYA AI is analyzing behavioral signatures against MITRE ATT&CK framework. Threat intelligence cross-reference in progress.';
+
+  var entry=document.createElement('div');
+  entry.className='ai-entry '+cls;
+  entry.innerHTML='<div class="ai-entry-header">'+new Date().toISOString().replace('T',' ').substring(0,19)+' — '+latest.type+' from '+latest.attacker_ip+'</div>'+
+    '<div class="ai-entry-text">'+analysis+'</div>';
+
+  var body=document.getElementById('aiBody');
+  body.innerHTML='';
+  body.appendChild(entry);
+
+  // Add risk score
+  var scores={'CRITICAL':92,'HIGH':74,'MEDIUM':45,'LOW':18};
+  var score=scores[sev]||50;
+  var riskEntry=document.createElement('div');
+  riskEntry.className='ai-entry';
+  riskEntry.innerHTML='<div class="ai-entry-header">Risk Assessment</div>'+
+    '<div class="ai-entry-text">Risk Score: <strong style="color:'+(sev==='CRITICAL'?'var(--red)':sev==='HIGH'?'var(--orange)':'var(--g)')+'">'+score+'/100</strong> — '+
+    (score>75?'Immediate action required. MAYA autonomous response activated.':score>50?'Elevated risk. Enhanced monitoring activated.':'Low risk. Logged for threat intelligence.')+
+    '</div>';
+  body.appendChild(riskEntry);
+}
+
+var termLines=[];
+function updateTerminal(attacks){
+  if(!attacks.length) return;
+  var latest=attacks[attacks.length-1];
+  var body=document.getElementById('termBody');
+  var msgs={
+    'SSH_BRUTE_FORCE':['t-alert','[!] SSH brute force — '+latest.attacker_ip+' — '+( latest.username_tried||'?')],
+    'WEB_CREDENTIAL_HARVEST':['t-alert','[!] CRITICAL — credentials harvested from '+latest.attacker_ip],
+    'WEB_RECON':['t-warn','[~] Web recon detected from '+latest.attacker_ip],
+    'DB_CONNECTION':['t-warn','[~] DB probe from '+latest.attacker_ip+' — honeypot engaged'],
+    'DB_LOGIN_ATTEMPT':['t-alert','[!] DB login attempt from '+latest.attacker_ip+' user:'+(latest.username_tried||'?')],
+    'REDIS_PROBE':['t-warn','[~] Redis probe from '+latest.attacker_ip],
+    'WINDOWS_RDP_BRUTE_FORCE':['t-alert','[!] RDP brute force — '+latest.attacker_ip],
+    'WINDOWS_LATERAL_MOVEMENT':['t-alert','[!] LATERAL MOVEMENT — '+latest.attacker_ip+' — ISOLATING'],
+    'WINDOWS_RANSOMWARE_BEHAVIOR':['t-alert','[!!!] RANSOMWARE BEHAVIOR — '+latest.attacker_ip+' — EMERGENCY RESPONSE'],
+    'WINDOWS_HONEYTOKEN_TRIGGERED':['t-success','[✓] HONEYTOKEN TRIGGERED — attacker '+latest.attacker_ip+' IDENTIFIED'],
+  };
+  var msg=msgs[latest.type]||['t-info','[+] '+latest.type+' from '+latest.attacker_ip];
+  var line=document.createElement('div');
+  line.className='t-line';
+  line.innerHTML='<span class="t-prompt">maya@soc:~$</span><span class="'+msg[0]+'"> '+msg[1]+'</span>';
+  body.insertBefore(line,body.lastElementChild);
+
+  // Auto response line
+  setTimeout(function(){
+    var resp=document.createElement('div');
+    resp.className='t-line';
+    resp.innerHTML='<span class="t-prompt">maya@soc:~$</span><span class="t-success"> autonomous.respond() — IP blocked — report generated — team alerted</span>';
+    body.insertBefore(resp,body.lastElementChild);
+    body.scrollTop=body.scrollHeight;
+  },800);
+}
+
+// REPORT MODAL
+function openReport(){
+  document.getElementById('modalOverlay').classList.add('open');
+  setTimeout(generateReport,800);
+}
+
+function closeReport(){
+  document.getElementById('modalOverlay').classList.remove('open');
+}
+
+function generateReport(){
+  var total=allAttacks.length;
+  var critical=allAttacks.filter(a=>a.severity==='CRITICAL').length;
+  var high=allAttacks.filter(a=>a.severity==='HIGH').length;
+  var ips=[...new Set(allAttacks.map(a=>a.attacker_ip))];
+  var db=allAttacks.filter(a=>a.type.includes('DB')||a.type.includes('MYSQL')||a.type.includes('REDIS')).length;
+  var win=allAttacks.filter(a=>a.type.includes('WINDOWS')).length;
+  var now=new Date().toISOString().replace('T',' ').substring(0,19);
+  var risk=critical>0?'CRITICAL':high>0?'HIGH':'MEDIUM';
+  var riskColor=critical>0?'danger':high>0?'warn':'safe';
+
+  document.getElementById('modalBody').innerHTML=`
+    <div class="report-section">
+      <div class="report-section-title">Executive Summary</div>
+      <div class="report-text">
+        MAYA Autonomous Security Platform detected and responded to <strong>${total} security events</strong> during the monitoring period.
+        Overall risk level is assessed as <strong class="${riskColor}">${risk}</strong>.
+        ${critical} critical threats were automatically contained without human intervention.
+        All real assets remained protected throughout — attackers interacted exclusively with MAYA deception fabric.
+      </div>
+    </div>
+    <div class="report-section">
+      <div class="report-section-title">Incident Statistics</div>
+      <div class="report-grid">
+        <div class="report-item"><div class="report-key">Total Events</div><div class="report-val col-green">${total}</div></div>
+        <div class="report-item"><div class="report-key">Critical Threats</div><div class="report-val danger">${critical}</div></div>
+        <div class="report-item"><div class="report-key">High Severity</div><div class="report-val warn">${high}</div></div>
+        <div class="report-item"><div class="report-key">Unique Attackers</div><div class="report-val col-blue">${ips.length}</div></div>
+        <div class="report-item"><div class="report-key">DB Attacks</div><div class="report-val col-yellow">${db}</div></div>
+        <div class="report-item"><div class="report-key">Windows Attacks</div><div class="report-val" style="color:#4dd0e1">${win}</div></div>
+        <div class="report-item"><div class="report-key">Report Generated</div><div class="report-val">${now}</div></div>
+        <div class="report-item"><div class="report-key">Real Assets Breached</div><div class="report-val safe">ZERO</div></div>
+      </div>
+    </div>
+    <div class="report-section">
+      <div class="report-section-title">AI Threat Assessment</div>
+      <div class="report-text">
+        <strong>Attack Pattern Analysis:</strong> Observed attack patterns indicate ${critical > 2 ? 'a coordinated, multi-vector campaign targeting multiple entry points simultaneously' : 'opportunistic scanning and exploitation attempts consistent with automated attack tools'}.
+        <br><br>
+        <strong>Attacker Profiling:</strong> ${ips.length} unique IP addresses identified. ${critical > 0 ? 'At least one attacker demonstrated advanced techniques consistent with organized threat actors. MITRE ATT&CK techniques observed include credential access, discovery, and lateral movement.' : 'Attack patterns consistent with automated scanning tools and script-kiddie activity.'}
+        <br><br>
+        <strong>MITRE ATT&CK Coverage:</strong> T1110 (Brute Force), T1595 (Active Scanning), T1046 (Network Discovery), T1056 (Input Capture), T1078 (Valid Accounts).
+        <br><br>
+        <strong>Zero False Positives:</strong> All ${total} alerts were confirmed real attacks. Real users never interact with MAYA decoys — every alert is mathematically guaranteed to be genuine.
+      </div>
+    </div>
+    <div class="report-section">
+      <div class="report-section-title">Autonomous Response Actions</div>
+      <div class="report-actions">
+        <div class="report-action ra-done">All attacker IPs automatically blocked at firewall level</div>
+        <div class="report-action ra-done">Compromised honeytoken credentials revoked across all systems</div>
+        <div class="report-action ra-done">Affected systems isolated from main network automatically</div>
+        <div class="report-action ra-done">Full forensic data captured for each attack event</div>
+        <div class="report-action ra-done">Attack intelligence added to MAYA threat database</div>
+        <div class="report-action ra-pending">Consider patching exposed services on paths attackers probed</div>
+        <div class="report-action ra-pending">Review and rotate any credentials that were targeted</div>
+      </div>
+    </div>
+    <div class="report-section">
+      <div class="report-section-title">Recommendations</div>
+      <div class="report-text">
+        <strong>Immediate:</strong> Review firewall rules for ports targeted by attackers. All blocked IPs confirmed malicious.<br><br>
+        <strong>Short Term:</strong> Deploy additional honeytokens in high-value areas attackers showed interest in. Increase deception density around database infrastructure.<br><br>
+        <strong>Long Term:</strong> Implement MAYA's attacker DNA profiling to recognize returning threat actors across future attacks regardless of IP rotation.
+      </div>
+    </div>
+  `;
+}
+
+function downloadReport(){
+  alert('PDF generation requires server-side processing. Run: python3 dashboard/report_generator.py to generate PDF.');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+employee_id,name,email,salary,department,password_hash
+<!-- TRACK:8dm5b15qti8ne11j URL:http://192.168.211.129:7777/track/8dm5b15qti8ne11j/view -->
+EMP001,John Smith,j.smith@company.com,85000,Engineering,482c811da5d5b4bc6d497ffa98491e38
+EMP002,Sarah Johnson,s.johnson@company.com,92000,Finance,1d1666a00e2a71a1519ad06553acbeda
+EMP003,Mike Davis,m.davis@company.com,78000,Marketing,186600490d9a1b12eddcc773d8c30d63
+EMP004,Emily Brown,e.brown@company.com,95000,Security,5b958202f36f9aaaa5f1fbf8f16f1a4d
+EMP005,Admin User,admin@company.com,120000,IT,2588596c98c72fb8f276f896c1584537

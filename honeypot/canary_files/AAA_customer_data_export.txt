@@ -1,0 +1,3 @@
+Customer Export - 2024
+ID,Name,Email,Phone
+1001,Alice Brown,alice@email.com,+1-555-0101

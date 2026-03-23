@@ -1,0 +1,3 @@
+This file is part of the security monitoring system.
+Do not delete or modify.
+Vaultrap MAYA Security Platform

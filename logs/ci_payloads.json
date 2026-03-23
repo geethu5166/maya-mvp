@@ -1,0 +1,49 @@
+{
+  "payloads": {
+    "vohx62g08cahwlhs": {
+      "id": "vohx62g08cahwlhs",
+      "file": "Q4_Financial_Report_CONFIDENTIAL.csv",
+      "type": "EXCEL_WEBSERVICE",
+      "created": "2026-03-22T19:31:03.152717",
+      "triggered": false,
+      "attacker_ip": null,
+      "description": "Financial data with Excel WEBSERVICE formula tracking"
+    },
+    "8dm5b15qti8ne11j": {
+      "id": "8dm5b15qti8ne11j",
+      "file": "employee_database_export.csv",
+      "type": "EMBEDDED_URL",
+      "created": "2026-03-22T19:31:03.152925",
+      "triggered": false,
+      "attacker_ip": null,
+      "description": "Employee data with embedded tracking URL"
+    },
+    "ubtyn7kkdn3ofvuy": {
+      "id": "ubtyn7kkdn3ofvuy",
+      "file": "production.config",
+      "type": "LICENSE_CHECK",
+      "created": "2026-03-22T19:31:03.153036",
+      "triggered": false,
+      "attacker_ip": null,
+      "description": "Config file with fake license check URL"
+    },
+    "zsgohemw8gr19ia3": {
+      "id": "zsgohemw8gr19ia3",
+      "file": "Annual_Security_Report_2024_CONFIDENTIAL.html",
+      "type": "PIXEL_JS_TRACKING",
+      "created": "2026-03-22T19:31:03.153087",
+      "triggered": false,
+      "attacker_ip": null,
+      "description": "HTML report with pixel + JS tracking for browser fingerprint"
+    },
+    "yrqq49d7d6tc4wce": {
+      "id": "yrqq49d7d6tc4wce",
+      "file": "production_db_dump_2024.sql",
+      "type": "SQL_VALIDATION",
+      "created": "2026-03-22T19:31:03.153136",
+      "triggered": false,
+      "attacker_ip": null,
+      "description": "SQL dump with validation query tracking"
+    }
+  }
+}
