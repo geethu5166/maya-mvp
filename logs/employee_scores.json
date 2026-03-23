@@ -1,0 +1,148 @@
+{
+  "employees": {
+    "EMP001": {
+      "id": "EMP001",
+      "name": "Rajesh Kumar",
+      "department": "Finance",
+      "email": "rajesh@company.com",
+      "score": 100,
+      "risk": "LOW",
+      "assessment": "Employee demonstrates good security awareness",
+      "events": [
+        {
+          "type": "MFA_ENABLED",
+          "date": "2026-03-20"
+        },
+        {
+          "type": "COMPLETED_TRAINING",
+          "date": "2026-03-19"
+        },
+        {
+          "type": "REPORTED_SUSPICIOUS",
+          "date": "2026-03-18"
+        },
+        {
+          "type": "STRONG_PASSWORD",
+          "date": "2026-03-15"
+        }
+      ],
+      "last_updated": "2026-03-23T11:17:20.941469"
+    },
+    "EMP002": {
+      "id": "EMP002",
+      "name": "Priya Sharma",
+      "department": "IT",
+      "email": "priya@company.com",
+      "score": 100,
+      "risk": "LOW",
+      "assessment": "Employee demonstrates good security awareness",
+      "events": [
+        {
+          "type": "COMPLETED_TRAINING",
+          "date": "2026-03-20"
+        },
+        {
+          "type": "MFA_ENABLED",
+          "date": "2026-03-18"
+        },
+        {
+          "type": "ODD_HOURS_ACCESS",
+          "date": "2026-03-17"
+        },
+        {
+          "type": "STRONG_PASSWORD",
+          "date": "2026-03-15"
+        }
+      ],
+      "last_updated": "2026-03-23T11:17:20.943078"
+    },
+    "EMP003": {
+      "id": "EMP003",
+      "name": "Amit Patel",
+      "department": "Sales",
+      "email": "amit@company.com",
+      "score": 35,
+      "risk": "CRITICAL",
+      "assessment": "Serious security risk \u2014 account review needed",
+      "events": [
+        {
+          "type": "CLICKED_PHISHING_LINK",
+          "date": "2026-03-21"
+        },
+        {
+          "type": "WEAK_PASSWORD",
+          "date": "2026-03-19"
+        },
+        {
+          "type": "FAILED_LOGINS",
+          "date": "2026-03-18"
+        },
+        {
+          "type": "ODD_HOURS_ACCESS",
+          "date": "2026-03-17"
+        }
+      ],
+      "last_updated": "2026-03-23T11:17:20.944438"
+    },
+    "EMP004": {
+      "id": "EMP004",
+      "name": "Sneha Reddy",
+      "department": "HR",
+      "email": "sneha@company.com",
+      "score": 0,
+      "risk": "CRITICAL",
+      "assessment": "Serious security risk \u2014 account review needed",
+      "events": [
+        {
+          "type": "USED_HONEYTOKEN",
+          "date": "2026-03-22"
+        },
+        {
+          "type": "ACCESSED_RESTRICTED",
+          "date": "2026-03-20"
+        },
+        {
+          "type": "SHARED_CREDENTIALS",
+          "date": "2026-03-18"
+        },
+        {
+          "type": "WEAK_PASSWORD",
+          "date": "2026-03-15"
+        }
+      ],
+      "last_updated": "2026-03-23T11:17:20.955804"
+    },
+    "EMP005": {
+      "id": "EMP005",
+      "name": "Vikram Singh",
+      "department": "Engineering",
+      "email": "vikram@company.com",
+      "score": 100,
+      "risk": "LOW",
+      "assessment": "Employee demonstrates good security awareness",
+      "events": [
+        {
+          "type": "MFA_ENABLED",
+          "date": "2026-03-20"
+        },
+        {
+          "type": "COMPLETED_TRAINING",
+          "date": "2026-03-18"
+        },
+        {
+          "type": "REPORTED_SUSPICIOUS",
+          "date": "2026-03-17"
+        },
+        {
+          "type": "STRONG_PASSWORD",
+          "date": "2026-03-15"
+        },
+        {
+          "type": "COMPLETED_TRAINING",
+          "date": "2026-03-10"
+        }
+      ],
+      "last_updated": "2026-03-23T11:17:20.956452"
+    }
+  }
+}
