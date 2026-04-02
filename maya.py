@@ -32,7 +32,7 @@ def start_web_honeypot():
 def start_dashboard():
     time.sleep(2)
     print("[MAYA] Starting Dashboard on port 5000...")
-    os.system("python3 dashboard/app.py")
+    os.chdir("/root/maya-mvp/dashboard"); os.system("python3 app.py"); os.chdir("/root/maya-mvp")
 
 def start_response_engine():
     time.sleep(3)

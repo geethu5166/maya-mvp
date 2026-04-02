@@ -1,12 +1,15 @@
 from flask import Flask, render_template
+from auth import auth, login_required
 from flask_socketio import SocketIO
 import json
 import os
 import threading
 import time
 
-app = Flask(__name__)
-app.config['SECRET_KEY'] = 'maya-secret-2026'
+app = Flask(__name__, template_folder='/root/maya-mvp/dashboard/templates')
+app.secret_key = 'maya-vaultrap-secret-2026'
+app.register_blueprint(auth)
+
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
 
 LOG_FILE = os.path.join(os.path.dirname(__file__), '..', 'logs', 'attacks.log')
@@ -59,6 +62,7 @@ def watch_log():
         time.sleep(1)
 
 @app.route('/')
+@login_required
 def index():
     attacks = read_attacks()
     stats = get_stats(attacks)
@@ -81,4 +85,4 @@ if __name__ == '__main__':
     watcher.start()
     print("[MAYA] Dashboard running on http://127.0.0.1:5000")
     print("-" * 50)
-    socketio.run(app, host='0.0.0.0', port=5000, debug=False)
+    socketio.run(app, host='0.0.0.0', port=5000, debug=False, allow_unsafe_werkzeug=True)

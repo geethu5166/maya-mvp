@@ -15,21 +15,21 @@
 --red:#ff3366;--orange:#ff8800;--blue:#0088ff;--yellow:#ffcc00;--purple:#9c27b0;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
-html,body{height:100%;overflow:hidden;}
+html,body{height:100%;overflow:hidden;}.topbar{overflow:visible!important;}
 body{font-family:'JetBrains Mono',monospace;background:var(--dark);color:var(--text);display:flex;flex-direction:column;}
 body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.025) 2px,rgba(0,0,0,0.025) 4px);pointer-events:none;z-index:9999;}
 
 /* TOPBAR */
-.topbar{height:52px;background:var(--dark2);border-bottom:1px solid var(--border2);display:flex;align-items:center;padding:0 20px;gap:20px;flex-shrink:0;}
+.topbar{height:52px;background:var(--dark2);border-bottom:1px solid var(--border2);display:flex;align-items:center;padding:0 16px;gap:8px;flex-shrink:0;}
 .logo{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;letter-spacing:3px;display:flex;align-items:center;gap:8px;color:var(--text);}
 .logo-icon{width:22px;height:22px;border:1px solid var(--g);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .logo-icon::before{content:'';width:8px;height:8px;background:var(--g);clip-path:polygon(50% 0%,100% 100%,0% 100%);animation:spin 4s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
 .logo .v{color:var(--g);}
-.topbar-divider{width:1px;height:20px;background:var(--border2);}
-.topbar-info{font-size:10px;color:var(--muted2);letter-spacing:1px;}
+.topbar-divider{display:none!important;}
+.topbar-info{display:none!important;}
 .topbar-info span{color:var(--g);}
-.topbar-right{margin-left:auto;display:flex;align-items:center;gap:16px;}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0;}
 .live-indicator{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--g);letter-spacing:1px;}
 .live-dot{width:6px;height:6px;background:var(--g);border-radius:50%;animation:pulse 1s infinite;}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.2}}
@@ -178,6 +178,44 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
 .modal-btn.primary{background:var(--g);color:var(--dark);border-color:var(--g);}
 .modal-btn.primary:hover{background:var(--g2);}
 .generating{display:flex;align-items:center;gap:8px;color:var(--g);font-size:11px;padding:20px;}
+
+/* SIGNOUT */
+#signout-link{display:flex!important;align-items:center;padding:7px 16px;background:rgba(255,69,105,0.15);border:1px solid rgba(255,69,105,0.5);border-radius:4px;color:#ff4569!important;font-size:11px;text-decoration:none;font-family:monospace;letter-spacing:1px;white-space:nowrap;}
+#signout-link:hover{background:rgba(255,69,105,0.3);}
+
+/* MOBILE PORTRAIT */
+@media(max-width:768px){
+html,body{overflow:auto!important;height:auto!important;}
+.layout,.main-wrap,.app-layout{flex-direction:column!important;margin-left:0!important;height:auto!important;}
+.sidebar{display:none!important;}
+.main-content{height:auto!important;overflow:visible!important;padding:8px!important;}
+.stats-row{grid-template-columns:repeat(3,1fr)!important;font-size:10px!important;}
+.feed-header{display:none!important;}
+.feed-row{grid-template-columns:1fr!important;font-size:10px!important;padding:8px!important;}
+.topbar{padding:0 10px!important;gap:8px!important;flex-wrap:wrap;height:auto!important;min-height:52px;}
+.topbar-info{display:none!important;}
+.topbar-divider{display:none!important;}
+.clock{font-size:10px!important;}
+.report-btn{display:none!important;}
+.report-btn::after{content:"Report";}
+.panel-grid,.bottom-grid,.ai-grid{grid-template-columns:1fr!important;}
+}
+
+/* MOBILE LANDSCAPE */
+@media(max-width:900px) and (orientation:landscape){
+.sidebar{display:none!important;}
+.layout,.main-wrap,.app-layout{margin-left:0!important;}
+.stats-row{grid-template-columns:repeat(6,1fr)!important;}
+.topbar-info{display:none!important;}
+}
+
+/* SMALL MOBILE */
+@media(max-width:480px){
+.stats-row{grid-template-columns:repeat(2,1fr)!important;}
+.clock{display:none!important;}
+#signout-link{padding:5px 10px!important;font-size:10px!important;}
+}
+
 </style>
 </head>
 <body>
@@ -194,9 +232,10 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
   <div class="topbar-info">AI Brain: <span>Mistral 7B</span></div>
   <div class="topbar-divider"></div>
   <div class="topbar-info">Honeypots: <span>SSH + WEB + DB + WINDOWS</span></div>
-  <div class="topbar-right">
+  <div class="topbar-right" style="display:flex;align-items:center;gap:12px;">
     <div class="live-indicator"><div class="live-dot"></div>LIVE</div>
     <div class="clock" id="clock">--:--:-- UTC</div>
+    <a href="/logout" id="signout-link" style="display:flex;align-items:center;padding:6px 14px;background:rgba(255,69,105,0.1);border:1px solid rgba(255,69,105,0.3);border-radius:4px;color:#ff4569;font-size:11px;text-decoration:none;font-family:monospace;letter-spacing:1px;transition:all 0.2s;">Sign Out</a>
     <button class="report-btn" onclick="openReport()"><span>Generate AI Report</span></button>
   </div>
 </div>
@@ -616,3 +655,6 @@ function downloadReport(){
 </script>
 </body>
 </html>
+
+
+nnEOF
