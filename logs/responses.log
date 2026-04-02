@@ -5036,3 +5036,5 @@
 {"timestamp": "2026-04-02T11:24:17.837741", "action": "IP_BLOCKED", "details": "Already blocked", "attacker_ip": "101.47.8.187", "trigger": "SSH_BRUTE_FORCE", "severity": "HIGH"}
 {"timestamp": "2026-04-02T11:25:14.925935", "action": "IP_BLOCKED", "details": "Already blocked", "attacker_ip": "101.47.8.187", "trigger": "SSH_BRUTE_FORCE", "severity": "HIGH"}
 {"timestamp": "2026-04-02T11:30:56.450566", "action": "IP_BLOCKED", "details": "IP 144.126.156.233 blocked successfully", "attacker_ip": "144.126.156.233", "trigger": "SSH_BRUTE_FORCE", "severity": "HIGH"}
+{"timestamp": "2026-04-02T11:32:31.603163", "action": "IP_BLOCKED", "details": "Already blocked", "attacker_ip": "101.47.8.187", "trigger": "SSH_BRUTE_FORCE", "severity": "HIGH"}
+{"timestamp": "2026-04-02T11:32:32.604884", "action": "IP_BLOCKED", "details": "Already blocked", "attacker_ip": "144.126.156.233", "trigger": "SSH_BRUTE_FORCE", "severity": "HIGH"}
