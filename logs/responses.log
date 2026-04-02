@@ -5022,3 +5022,16 @@
 {"timestamp": "2026-04-02T06:10:20.883635", "action": "IP_BLOCKED", "details": "Already blocked", "attacker_ip": "113.45.219.238", "trigger": "SSH_BRUTE_FORCE", "severity": "HIGH"}
 {"timestamp": "2026-04-02T06:10:28.893464", "action": "IP_BLOCKED", "details": "Already blocked", "attacker_ip": "113.45.219.238", "trigger": "SSH_BRUTE_FORCE", "severity": "HIGH"}
 {"timestamp": "2026-04-02T06:10:40.909775", "action": "IP_BLOCKED", "details": "Already blocked", "attacker_ip": "113.45.219.238", "trigger": "SSH_BRUTE_FORCE", "severity": "HIGH"}
+{"timestamp": "2026-04-02T07:51:25.279883", "action": "IP_BLOCKED", "details": "Already blocked", "attacker_ip": "45.148.10.121", "trigger": "SSH_BRUTE_FORCE", "severity": "HIGH"}
+{"timestamp": "2026-04-02T08:25:56.246522", "action": "IP_BLOCKED", "details": "Already blocked", "attacker_ip": "45.148.10.121", "trigger": "SSH_BRUTE_FORCE", "severity": "HIGH"}
+{"timestamp": "2026-04-02T08:58:52.375793", "action": "IP_BLOCKED", "details": "Already blocked", "attacker_ip": "45.148.10.121", "trigger": "SSH_BRUTE_FORCE", "severity": "HIGH"}
+{"timestamp": "2026-04-02T09:31:09.049453", "action": "IP_BLOCKED", "details": "Already blocked", "attacker_ip": "45.148.10.121", "trigger": "SSH_BRUTE_FORCE", "severity": "HIGH"}
+{"timestamp": "2026-04-02T10:02:43.850048", "action": "IP_BLOCKED", "details": "Already blocked", "attacker_ip": "45.148.10.121", "trigger": "SSH_BRUTE_FORCE", "severity": "HIGH"}
+{"timestamp": "2026-04-02T10:13:10.820951", "action": "LOGGED", "details": "Low severity event recorded", "attacker_ip": "18.218.118.203", "trigger": "WEB_RECON", "severity": "LOW"}
+{"timestamp": "2026-04-02T10:15:22.521473", "action": "LOGGED", "details": "Low severity event recorded", "attacker_ip": "18.218.118.203", "trigger": "WEB_RECON", "severity": "LOW"}
+{"timestamp": "2026-04-02T11:11:35.690667", "action": "IP_BLOCKED", "details": "Already blocked", "attacker_ip": "45.148.10.121", "trigger": "SSH_BRUTE_FORCE", "severity": "HIGH"}
+{"timestamp": "2026-04-02T11:21:29.587919", "action": "IP_BLOCKED", "details": "IP 101.47.8.187 blocked successfully", "attacker_ip": "101.47.8.187", "trigger": "SSH_BRUTE_FORCE", "severity": "HIGH"}
+{"timestamp": "2026-04-02T11:22:24.675415", "action": "IP_BLOCKED", "details": "Already blocked", "attacker_ip": "101.47.8.187", "trigger": "SSH_BRUTE_FORCE", "severity": "HIGH"}
+{"timestamp": "2026-04-02T11:23:20.753965", "action": "IP_BLOCKED", "details": "Already blocked", "attacker_ip": "101.47.8.187", "trigger": "SSH_BRUTE_FORCE", "severity": "HIGH"}
+{"timestamp": "2026-04-02T11:24:17.837741", "action": "IP_BLOCKED", "details": "Already blocked", "attacker_ip": "101.47.8.187", "trigger": "SSH_BRUTE_FORCE", "severity": "HIGH"}
+{"timestamp": "2026-04-02T11:25:14.925935", "action": "IP_BLOCKED", "details": "Already blocked", "attacker_ip": "101.47.8.187", "trigger": "SSH_BRUTE_FORCE", "severity": "HIGH"}

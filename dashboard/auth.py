@@ -1,8 +1,8 @@
-from flask import Blueprint, render_template_string, request, redirect, url_for, session
+from flask import Blueprint, render_template, request, redirect, url_for, session
 from functools import wraps
 import hashlib
 
-auth = Blueprint("auth", __name__)
+auth = Blueprint("auth", __name__, template_folder="/root/maya-mvp/dashboard/templates")
 
 USERNAME = "vaultrap"
 PASSWORD_HASH = hashlib.sha256("maya@2026".encode()).hexdigest()
@@ -22,12 +22,14 @@ def login():
         username = request.form.get("username")
         password = request.form.get("password")
         password_hash = hashlib.sha256(password.encode()).hexdigest()
+
         if username == USERNAME and password_hash == PASSWORD_HASH:
             session["logged_in"] = True
-            return redirect(url_for("index"))
+            return redirect(url_for("dashboard"))
         else:
-            error = "Invalid credentials. Access denied."
-    return render_template_string(open("/root/maya-mvp/dashboard/templates/login.html").read(), error=error)
+            error = "Invalid username or password"
+
+    return render_template("login.html", error=error)
 
 @auth.route("/logout")
 def logout():
