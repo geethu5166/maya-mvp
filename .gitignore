@@ -1,11 +1,16 @@
-data/cicids2018.csv
-data/nslkdd_train.txt
-data/nslkdd_test.txt
-data/kddcup.gz
-venv/
+# Logs - never push sensitive attack data
+logs/*.log
+logs/*.txt
+logs/*.json
+
+# Python
 __pycache__/
 *.pyc
-*.pkl
-honeypot/decoy_files/
-logs/honeytokens.json
-logs/reports/
+*.pyo
+venv/
+.env
+
+# Backups
+dashboard/templates/index_backup*.html
+dashboard/templates/index_old*.html
+dashboard/templates/index_working*.html
