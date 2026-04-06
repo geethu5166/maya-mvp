@@ -1,3 +1,5 @@
+import sys; sys.path.append("/root/maya-mvp")
+from autoblock import check_and_block_attacker
 import socket
 import threading
 import paramiko
@@ -36,6 +38,7 @@ def log_attack(attacker_ip, attacker_port, username, password):
     # Save to log file for the dashboard to read
     with open(LOG_FILE, 'a') as f:
         f.write(json.dumps(attack_data) + '\n')
+    check_and_block_attacker(attacker_ip)
 
 class FakeSSHServer(paramiko.ServerInterface):
     """
