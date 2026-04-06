@@ -22,13 +22,11 @@ def login():
         username = request.form.get("username")
         password = request.form.get("password")
         password_hash = hashlib.sha256(password.encode()).hexdigest()
-
         if username == USERNAME and password_hash == PASSWORD_HASH:
             session["logged_in"] = True
-            return redirect(url_for("dashboard"))
+            return redirect(url_for("index"))
         else:
-            error = "Invalid username or password"
-
+            error = "Invalid credentials. Access denied."
     return render_template("login.html", error=error)
 
 @auth.route("/logout")
