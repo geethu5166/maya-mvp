@@ -11,3 +11,4 @@ reportlab
 psutil
 python-dotenv
 eventlet
+networkx
