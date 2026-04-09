@@ -93,6 +93,7 @@ log_info "Step 2: Pulling latest code from GitHub..."
 cd "$PROJECT_DIR"
 git fetch origin
 git reset --hard origin/main
+chmod +x "$PROJECT_DIR/deployment/"*.sh
 log_success "Code updated to latest version"
 
 # ============ STEP 3: UPDATE ENVIRONMENT ============

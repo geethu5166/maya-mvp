@@ -98,6 +98,7 @@ if [ ! -d "/root/maya-mvp/.git" ]; then
     git init
     git remote add origin https://github.com/geethu5166/maya-mvp.git
     git pull origin main
+    chmod +x /root/maya-mvp/deployment/*.sh
     log_success "Repository initialized"
 else
     log_warning "Repository already initialized"

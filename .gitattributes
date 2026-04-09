@@ -1,0 +1,2 @@
+*.sh eol=lf diff=bash
+deployment/*.sh eol=lf diff=bash
