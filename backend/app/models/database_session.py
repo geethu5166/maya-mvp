@@ -16,7 +16,7 @@ Version: 1.0
 """
 
 import logging
-from sqlalchemy import create_engine, event, inspect
+from sqlalchemy import create_engine, event, inspect, func
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.pool import QueuePool, StaticPool
 from contextlib import contextmanager

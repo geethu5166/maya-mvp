@@ -445,7 +445,7 @@ class IncidentCorrelationEngine:
         
         try:
             for i, incident1 in enumerate(incidents):
-                for incident2 in incidents[i + 1:]:
+                for j, incident2 in enumerate(incidents[i + 1:], start=i + 1):
                     # Check if incidents share common attacker
                     attacker1 = incident1.get('source_ip')
                     attacker2 = incident2.get('source_ip')

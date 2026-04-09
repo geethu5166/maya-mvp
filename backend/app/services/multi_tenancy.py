@@ -12,6 +12,7 @@ from enum import Enum
 import logging
 from datetime import datetime
 import contextvars
+from app.models.database import Incident, Detection, Event, Asset
 
 logger = logging.getLogger(__name__)
 
