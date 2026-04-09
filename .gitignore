@@ -1,0 +1,135 @@
+# ====================
+# Environment & Secrets
+# ====================
+.env
+.env.local
+.env.*.local
+.env.production
+.env.staging
+.env.docker
+*.key
+*.pem
+*.crt
+secrets/
+
+# ====================
+# Python
+# ====================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv
+venv.bak/
+env.bak/
+
+# ====================
+# IDE & Editor
+# ====================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+.code-workspace
+
+# ====================
+# Testing & Coverage
+# ====================
+.pytest_cache/
+.coverage
+htmlcov/
+*.cover
+.hypothesis/
+
+# ====================
+# Node/Frontend
+# ====================
+node_modules/
+npm-debug.log
+yarn-error.log
+dist/
+.next/
+
+# ====================
+# Logs
+# ====================
+logs/
+*.log
+
+# ====================
+# Temporary Files
+# ====================
+*.tmp
+*.bak
+*.backup
+*.orig
+.DS_Store
+Thumbs.db
+
+# ====================
+# Docker
+# ====================
+docker-compose.override.yml
+
+# ====================
+# Database
+# ====================
+*.db
+*.sqlite
+*.sqlite3
+pgdata/
+
+# ====================
+# Sensitive Data
+# ====================
+*_key
+*_secret
+*.token
+*.credential
+config.local.json
+credentials.json
+
+# ====================
+# IDE specific  
+# ====================
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/
+*.iml
+
+# ====================
+# Generated Files
+# ====================
+*.pyc
+*.pyo
+*.jinja2
+.cache/

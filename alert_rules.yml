@@ -1,0 +1,181 @@
+# Prometheus Alert Rules for MAYA SOC Enterprise
+# These are the Phase 2 detection alerts
+
+groups:
+  - name: maya_soc_alerts
+    interval: 30s
+    rules:
+
+      # ================================
+      # API Performance Alerts
+      # ================================
+      - alert: HighEventLatency
+        expr: event_processing_latency_ms > 1000
+        for: 5m
+        labels:
+          severity: warning
+          component: event_pipeline
+        annotations:
+          summary: "High event processing latency"
+          description: "Event processing latency exceeded 1000ms for 5 minutes"
+          dashboard: "http://grafana:3000/d/maya-events"
+
+      - alert: APIErrorRate
+        expr: rate(api_errors_total[5m]) > 0.05
+        for: 10m
+        labels:
+          severity: warning
+          component: api
+        annotations:
+          summary: "High API error rate"
+          description: "API error rate exceeded 5% for 10 minutes"
+
+      - alert: APIRequestLatency
+        expr: api_request_latency_ms > 2000
+        for: 5m
+        labels:
+          severity: warning
+          component: api
+        annotations:
+          summary: "High API request latency"
+          description: "API request latency exceeded 2000ms"
+
+      # ================================
+      # Incident Alerts
+      # ================================
+      - alert: IncidentBacklog
+        expr: incidents_open > 50
+        for: 15m
+        labels:
+          severity: warning
+          component: incidents
+        annotations:
+          summary: "High incident backlog"
+          description: "More than 50 incidents are currently open"
+          action: "Review and prioritize open incidents"
+
+      - alert: CriticalIncidents
+        expr: incidents_high_priority > 5
+        for: 10m
+        labels:
+          severity: critical
+          component: incidents
+        annotations:
+          summary: "Multiple critical incidents detected"
+          description: "More than 5 high priority incidents are currently active"
+          action: "Immediate escalation and response required"
+
+      # ================================
+      # Detection Engine Alerts
+      # ================================
+      - alert: HighDetectionRate
+        expr: rate(detections_triggered_total[5m]) > 0.5
+        for: 10m
+        labels:
+          severity: warning
+          component: detection
+        annotations:
+          summary: "High detection rate"
+          description: "Detection rule trigger rate exceeded 0.5 per second"
+
+      - alert: LowDetectionConfidence
+        expr: detection_confidence_scores < 0.7
+        for: 30m
+        labels:
+          severity: info
+          component: detection
+        annotations:
+          summary: "Low detection confidence"
+          description: "Detection confidence scores are below 70%"
+
+      # ================================
+      # Database Alerts
+      # ================================
+      - alert: DatabaseConnectionExhaustion
+        expr: db_connections_open > 18
+        for: 10m
+        labels:
+          severity: critical
+          component: database
+        annotations:
+          summary: "Database connection pool nearly exhausted"
+          description: "More than 18 out of 20 database connections are in use"
+          action: "Check for connection leaks or high load"
+
+      - alert: HighDatabaseLatency
+        expr: db_query_latency_ms > 5000
+        for: 15m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: "High database query latency"
+          description: "Database query latency exceeded 5000ms"
+
+      - alert: DatabaseDown
+        expr: up{job="postgres"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          component: database
+        annotations:
+          summary: "Database is down"
+          description: "PostgreSQL database is not responding"
+          action: "Immediately check database service health"
+
+      # ================================
+      # System Alerts
+      # ================================
+      - alert: HighCPUUsage
+        expr: system_cpu_percent > 80
+        for: 10m
+        labels:
+          severity: warning
+          component: system
+        annotations:
+          summary: "High CPU usage"
+          description: "CPU usage exceeded 80%"
+
+      - alert: HighMemoryUsage
+        expr: system_memory_percent > 85
+        for: 10m
+        labels:
+          severity: warning
+          component: system
+        annotations:
+          summary: "High memory usage"
+          description: "Memory usage exceeded 85%"
+
+      # ================================
+      # Service Health Alerts
+      # ================================
+      - alert: KafkaDown
+        expr: up{job="kafka"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          component: kafka
+        annotations:
+          summary: "Kafka broker is down"
+          description: "Kafka broker is not responding"
+
+      - alert: RedisDown
+        expr: up{job="redis"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          component: redis
+        annotations:
+          summary: "Redis cache is down"
+          description: "Redis is not responding"
+
+      - alert: BackendDown
+        expr: up{job="maya-backend"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          component: backend
+        annotations:
+          summary: "MAYA SOC Backend is down"
+          description: "Backend API is not responding"
+          action: "Check backend service logs"

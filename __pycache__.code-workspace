@@ -1,0 +1,25 @@
+{
+	"folders": [
+		{
+			"path": "../../maya-mvp-main/__pycache__"
+		},
+		{
+			"path": "../../maya-mvp-main/core"
+		},
+		{
+			"path": "../../maya-mvp-main/dashboard"
+		},
+		{
+			"path": "../../maya-mvp-main/data"
+		},
+		{
+			"path": "../../maya-mvp-main/detection"
+		},
+		{
+			"path": "../../maya-mvp-main/honeypot"
+		},
+		{
+			"path": "../../maya-mvp-main/logs"
+		}
+	]
+}
