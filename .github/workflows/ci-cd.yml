@@ -216,19 +216,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       
-      - name: Install Docker Compose
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y docker-compose
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v2
       
       - name: Validate docker-compose.yml
         run: |
-          docker-compose -f docker-compose.yml config
+          docker compose -f docker-compose.yml config
           echo "✅ docker-compose.yml is valid"
       
       - name: Check Docker Compose services
         run: |
-          docker-compose -f docker-compose.yml config --services
+          docker compose -f docker-compose.yml config --services
   
   # ================================
   # INTEGRATION TESTS (Optional)
@@ -244,11 +242,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v2
+      
       - name: Start Docker Compose stack
         run: |
-          docker-compose up -d
+          docker compose up -d
           sleep 30
-          docker-compose ps
+          docker compose ps
       
       - name: Health checks
         run: |
@@ -268,8 +269,8 @@ jobs:
       - name: Cleanup
         if: always()
         run: |
-          docker-compose down
-          docker-compose logs --tail=50
+          docker compose down
+          docker compose logs --tail=50 || true
 
   # ================================
   # DEPLOY TO STAGING (Optional)
