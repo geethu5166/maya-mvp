@@ -84,27 +84,26 @@ log_success "Monitoring tools installed"
 
 # ============ CREATE PROJECT DIRECTORY ============
 log_info "Creating project directory..."
-mkdir -p /root/maya-soc-enterprise
+mkdir -p /root/maya-mvp
 mkdir -p /root/backups
 mkdir -p /root/logs
 
 log_success "Directories created"
 
 # ============ CLONE REPOSITORY ============
-log_info "Cloning repository..."
+log_info "Initializing repository..."
 
-if [ ! -d "/root/maya-soc-enterprise/.git" ]; then
-    cd /root
-    if [ -d "maya-soc-enterprise" ]; then
-        rm -rf maya-soc-enterprise
-    fi
-    git clone https://github.com/YOUR_USERNAME/maya-soc-enterprise.git
-    log_success "Repository cloned"
+if [ ! -d "/root/maya-mvp/.git" ]; then
+    cd /root/maya-mvp
+    git init
+    git remote add origin https://github.com/geethu5166/maya-mvp.git
+    git pull origin main
+    log_success "Repository initialized"
 else
-    log_warning "Repository already exists"
+    log_warning "Repository already initialized"
 fi
 
-cd /root/maya-soc-enterprise
+cd /root/maya-mvp
 
 # ============ CREATE ENVIRONMENT FILE ============
 log_info "Creating environment file..."
@@ -124,7 +123,7 @@ fi
 # ============ SETUP BACKUPS CRON ============
 log_info "Setting up automated backups..."
 
-CRON_JOB="0 2 * * * /root/maya-soc-enterprise/deployment/backup.sh >> /root/logs/backup.log 2>&1"
+CRON_JOB="0 2 * * * /root/maya-mvp/deployment/backup.sh >> /root/logs/backup.log 2>&1"
 
 if ! crontab -l 2>/dev/null | grep -q "backup.sh"; then
     (crontab -l 2>/dev/null; echo "$CRON_JOB") | crontab -
