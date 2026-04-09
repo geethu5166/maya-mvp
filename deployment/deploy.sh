@@ -53,9 +53,9 @@ fi
 log_success "Prerequisites check passed"
 
 # ============ CONFIGURATION ============
-PROJECT_DIR="/root/maya-soc-enterprise"
+PROJECT_DIR="/root/maya-mvp"
 BACKUP_DIR="/root/backups"
-DOMAIN="app.vaultrap.com"
+DOMAIN="maya.vaultrap.com"
 EMAIL="your-email@example.com"
 
 log_info "Configuration:"
