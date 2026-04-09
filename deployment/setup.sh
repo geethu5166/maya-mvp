@@ -154,33 +154,33 @@ cat > /root/README.md << 'EOF'
 
 1. **Configure Environment**
    ```bash
-   cd /root/maya-soc-enterprise
+   cd /root/maya-mvp
    nano .env
    ```
    Update with your:
    - Secure passwords
-   - Domain name (app.vaultrap.com)
+   - Domain name (maya.vaultrap.com)
    - Email address
    - Any API keys
 
 2. **Generate SSL Certificate**
    ```bash
-   certbot certonly --standalone -d app.vaultrap.com --email your-email@example.com --agree-tos
+   certbot certonly --standalone -d maya.vaultrap.com --email your-email@example.com --agree-tos
    ```
 
 3. **Deploy Application**
    ```bash
-   sudo /root/maya-soc-enterprise/deployment/deploy.sh
+   sudo /root/maya-mvp/deployment/deploy.sh
    ```
 
 4. **Monitor Services**
    ```bash
-   /root/maya-soc-enterprise/deployment/monitor.sh
+   /root/maya-mvp/deployment/monitor.sh
    ```
 
 5. **View Logs**
    ```bash
-   cd /root/maya-soc-enterprise
+   cd /root/maya-mvp
    docker compose logs -f
    ```
 
@@ -216,7 +216,7 @@ df -h
 
 ## Support
 
-- GitHub: https://github.com/YOUR_USERNAME/maya-soc-enterprise
+- GitHub: https://github.com/geethu5166/maya-mvp
 - Logs: /root/logs/
 - Backups: /root/backups/
 
@@ -228,7 +228,7 @@ log_success "Quick start guide created"
 # ============ PERMISSION FIX ============
 log_info "Setting up file permissions..."
 
-chmod +x /root/maya-soc-enterprise/deployment/*.sh
+chmod +x /root/maya-mvp/deployment/*.sh
 
 log_success "Permissions configured"
 
@@ -242,16 +242,16 @@ echo ""
 log_info "NEXT STEPS:"
 echo ""
 echo "1. Configure your environment:"
-echo "   nano /root/maya-soc-enterprise/.env"
+echo "   nano /root/maya-mvp/.env"
 echo ""
 echo "2. Generate SSL certificate:"
-echo "   certbot certonly --standalone -d app.vaultrap.com --email your-email@example.com"
+echo "   certbot certonly --standalone -d maya.vaultrap.com --email your-email@example.com"
 echo ""
 echo "3. Start deployment:"
-echo "   sudo /root/maya-soc-enterprise/deployment/deploy.sh"
+echo "   sudo /root/maya-mvp/deployment/deploy.sh"
 echo ""
 echo "4. Monitor your application:"
-echo "   /root/maya-soc-enterprise/deployment/monitor.sh"
+echo "   /root/maya-mvp/deployment/monitor.sh"
 echo ""
 
 echo -e "${BLUE}Useful commands:${NC}"
