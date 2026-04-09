@@ -82,7 +82,7 @@ lime==0.2.0
 optuna==4.8.0
 
 # Zero Trust Engine
-pyjwt==2.8.1
+PyJWT==2.12.1
 pyotp==2.9.0
 
 # Secrets Detection Engine
