@@ -49,7 +49,6 @@ sentence-transformers==2.2.2
 scikit-learn==1.3.2
 
 # Deep Learning & ML
-keras==2.15.0
 tensorflow==2.15.0
 xgboost==2.0.3
 torch==2.1.1
@@ -64,7 +63,6 @@ shodan==1.28.0
 requests==2.31.0
 
 # Time Series & Analytics
-prophet==1.1.5
 statsmodels==0.14.0
 scipy==1.11.4
 
@@ -76,23 +74,16 @@ spacy==3.7.2
 langchain==0.1.4
 openai==1.3.5
 
-# Explainable AI
+# Model Explanability
 shap==0.44.1
 lime==0.2.0
-interpret==0.3.2
 
 # Model validation & hyperparameter optimization
 scikit-optimize==0.9.0
-hyperopt==0.2.7
 optuna==3.14.0
-
-# Data quality & schema validation
-pandera==0.18.0
-great-expectations==0.18.8
 
 # Zero Trust Engine
 pyjwt==2.8.1
-cryptography==41.0.7
 pyotp==2.9.0
 
 # Secrets Detection Engine
