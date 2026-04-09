@@ -24,7 +24,7 @@ asyncpg==0.29.0
 redis==5.0.1
 
 # Data Validation & Processing
-pydantic==2.5.0
+pydantic==2.5.2
 pydantic-extra-types==2.3.0
 
 # HTTP Client
