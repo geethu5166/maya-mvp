@@ -11,7 +11,7 @@ COPY tsconfig.json ./
 COPY vite.config.ts ./
 
 # Install dependencies
-RUN npm ci
+RUN npm install
 
 # Copy source code
 COPY src ./src
