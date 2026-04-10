@@ -5,7 +5,7 @@ from typing import Optional
 from jose import jwt, JWTError
 from passlib.context import CryptContext
 from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBearer, HTTPAuthCredentials
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from .config import get_settings
 
 settings = get_settings()
@@ -32,7 +32,7 @@ class TokenManager:
             return None
 
 
-async def get_current_user(credentials: HTTPAuthCredentials = Depends(security)) -> dict:
+async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> dict:
     token = credentials.credentials
     payload = TokenManager.verify_token(token)
     if not payload:
