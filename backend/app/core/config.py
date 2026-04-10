@@ -1,5 +1,6 @@
 """Configuration management using environment variables."""
 
+import json
 import os
 from functools import lru_cache
 from typing import List
@@ -29,11 +30,10 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
     
-    CORS_ORIGINS: List[str] = [
-        "http://localhost:5173",
-        "http://localhost:3000",
-        "http://127.0.0.1:5173",
-    ]
+    CORS_ORIGINS: str = os.getenv(
+        "CORS_ORIGINS",
+        "http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173",
+    )
     
     # IMPORTANT: Admin credentials MUST be strong and set in environment
     # Never use default credentials - must be set before first run
@@ -84,6 +84,22 @@ class Settings(BaseSettings):
                 raise ValueError(
                     "Production security validation failed:\n" + "\n".join(errors)
                 )
+
+    def get_cors_origins(self) -> List[str]:
+        """Return CORS origins from either JSON array or comma-separated string."""
+        raw_value = (self.CORS_ORIGINS or "").strip()
+        if not raw_value:
+            return []
+
+        if raw_value.startswith("["):
+            try:
+                parsed = json.loads(raw_value)
+                if isinstance(parsed, list):
+                    return [str(item).strip() for item in parsed if str(item).strip()]
+            except json.JSONDecodeError:
+                pass
+
+        return [origin.strip() for origin in raw_value.split(",") if origin.strip()]
 
 
 @lru_cache()
