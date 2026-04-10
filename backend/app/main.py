@@ -335,7 +335,9 @@ async def lifespan(app: FastAPI):
         
     except Exception as e:
         logger.error(f"✗ Fatal error during startup: {e}", exc_info=True)
-        raise
+        if settings.STARTUP_STRICT:
+            raise
+        logger.warning("⚠ Continuing in degraded mode after startup error (STARTUP_STRICT=false)")
     
     yield
     
