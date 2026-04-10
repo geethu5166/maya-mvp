@@ -19,16 +19,30 @@ class LoginRequest(BaseModel):
     password: str
 
 
+class UserData(BaseModel):
+    user_id: str
+    username: str
+    email: str
+    roles: list[str]
+
+
 class LoginResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
+    user: UserData
 
 
 @router.post("/auth/login", response_model=LoginResponse)
 async def login(request: LoginRequest):
     if request.username == settings.INIT_ADMIN_USERNAME and request.password == settings.INIT_ADMIN_PASSWORD:
         token = TokenManager.create_access_token({"sub": request.username, "scopes": ["admin"]})
-        return LoginResponse(access_token=token)
+        user_data = UserData(
+            user_id="admin-001",
+            username=request.username,
+            email="admin@maya-soc.local",
+            roles=["admin"]
+        )
+        return LoginResponse(access_token=token, user=user_data)
     raise HTTPException(status_code=401, detail="Invalid credentials")
 
 
