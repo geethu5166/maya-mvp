@@ -18,8 +18,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Copy requirements
 COPY requirements.txt .
 
-# Create wheels for all dependencies
-RUN pip wheel --no-cache-dir --no-deps --wheel-dir /build/wheels -r requirements.txt
+# Create wheels for all dependencies (including transitives)
+RUN python -m pip install --upgrade pip setuptools wheel && \
+    pip wheel --no-cache-dir --wheel-dir /build/wheels -r requirements.txt
 
 
 # ========================
@@ -32,12 +33,13 @@ WORKDIR /app
 # Install runtime dependencies only
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq5 \
+    ca-certificates \
     curl \
     dumb-init \
     && rm -rf /var/lib/apt/lists/*
 
 # Create non-root user for security (principle of least privilege)
-RUN useradd -m -u 1000 -s /sbin/nologin appuser && \
+RUN useradd -m -u 1000 -s /usr/sbin/nologin appuser && \
     mkdir -p /app /app/logs && \
     chown -R appuser:appuser /app
 
@@ -47,8 +49,8 @@ COPY --from=builder /build/wheels /wheels
 # Copy requirements
 COPY --from=builder /build/requirements.txt .
 
-# Install Python dependencies from wheels
-RUN pip install --no-cache /wheels/* && \
+# Install Python dependencies from local wheels only
+RUN pip install --no-cache-dir --no-index --find-links=/wheels -r requirements.txt && \
     rm -rf /wheels
 
 # Copy application code

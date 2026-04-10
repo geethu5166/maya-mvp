@@ -1,15 +1,16 @@
-﻿import { useState, useEffect } from "react"
-import { usePaginatedEvents, useQuery } from "../hooks/useQuery"
-import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts"
+﻿import { useState } from "react"
+import { usePaginatedEvents } from "../hooks/useQuery"
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts"
 import AlertTable from "../components/AlertTable"
 import RiskScoreCard from "../components/RiskScoreCard"
 import AIAnalyst from "../components/AIAnalyst"
 import ThreatMap from "../components/ThreatMap"
 import { TrendingUp, Activity, AlertTriangle, Shield } from "lucide-react"
+import { SecurityEvent } from "../types"
 
 export default function Dashboard() {
-  const { events, loading } = usePaginatedEvents()
-  const [selectedEvent, setSelectedEvent] = useState(null)
+  const { events } = usePaginatedEvents()
+  const [selectedEvent, setSelectedEvent] = useState<SecurityEvent | null>(null)
 
   const trendData = [
     { time: "00:00", alerts: 12, incidents: 3 },
@@ -120,10 +121,10 @@ export default function Dashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <AlertTable events={events || []} onSelectEvent={setSelectedEvent} />
+          <AlertTable events={events || []} onSelectEvent={(event) => setSelectedEvent(event)} />
         </div>
         <div className="space-y-6">
-          <RiskScoreCard riskScore={42} />
+          <RiskScoreCard score={42} title="Current Risk Score" subtitle="Live environment posture" />
           <ThreatMap threats={threatsByCountry} />
         </div>
       </div>

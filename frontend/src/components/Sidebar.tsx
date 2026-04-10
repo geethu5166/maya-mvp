@@ -1,4 +1,4 @@
-import { BarChart3, AlertCircle, Shield, Zap, Settings } from 'lucide-react'
+import { BarChart3, AlertCircle, Shield, Zap } from 'lucide-react'
 
 interface SidebarProps {
   currentPage: 'dashboard' | 'incidents' | 'settings'

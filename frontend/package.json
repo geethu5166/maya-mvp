@@ -35,7 +35,8 @@
     "autoprefixer": "^10.4.16",
     "eslint": "^8.54.0",
     "@typescript-eslint/eslint-plugin": "^6.13.2",
-    "@typescript-eslint/parser": "^6.13.2"
+    "@typescript-eslint/parser": "^6.13.2",
+    "terser": "^5.37.0"
   },
   "engines": {
     "node": ">=18.0.0"

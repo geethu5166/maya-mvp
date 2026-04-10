@@ -22,9 +22,11 @@ from fastapi.middleware.base import BaseHTTPMiddleware
 from fastapi.responses import JSONResponse
 
 from app.core.config import get_settings
-from app.core.logging_config import setup_logging, get_logger
+from app.core.logging_service import setup_logging, get_logger
 from app.core.event_bus import event_bus
 from app.core.event_pipeline import create_production_pipeline, ProductionEventPipeline
+from app.core.unified_event_pipeline import UnifiedEventPipeline
+from app.core.watchdog import ModuleWatchdog
 from app.core.health_checks import (
     initialize_health_checks,
     health_checker,
@@ -217,12 +219,37 @@ async def lifespan(app: FastAPI):
             else:
                 logger.warning("⚠ Proceeding in development mode (secrets not validated)")
         
-        # STEP 2: Initialize event pipeline
+        # STEP 1.5: Initialize Unified Event Pipeline
+        logger.info("Initializing unified security event pipeline...")
+        try:
+            app.state.unified_event_pipeline = UnifiedEventPipeline(
+                kafka_brokers=[settings.KAFKA_BOOTSTRAP_SERVERS],
+                kafka_topic=settings.KAFKA_TOPIC_EVENTS,
+                database_session=None  # Will be set after database init
+            )
+            await app.state.unified_event_pipeline.startup()
+            logger.info("✓ Unified event pipeline initialized (Kafka + Database publishers)")
+        except Exception as e:
+            logger.error(f"✗ Failed to initialize unified event pipeline: {e}")
+            if settings.ENV == "production":
+                raise
+        
+        # STEP 1.6: Initialize Module Watchdog
+        logger.info("Initializing service watchdog...")
+        try:
+            app.state.watchdog = ModuleWatchdog(check_interval_seconds=30, max_retries=3)
+            app.state.watchdog.start()
+            logger.info("✓ Module watchdog initialized (auto-restart enabled)")
+        except Exception as e:
+            logger.error(f"✗ Failed to initialize watchdog: {e}")
+            # Watchdog failure is not critical
+        
+        # STEP 3: Initialize event pipeline
         logger.info("Initializing production event pipeline...")
         app.state.event_pipeline: ProductionEventPipeline = create_production_pipeline()
         logger.info("✓ Event pipeline ready (Kafka backend)")
         
-        # STEP 3: Initialize backend services
+        # STEP 4: Initialize backend services
         logger.info("Initializing backend services...")
         await event_bus.connect()
         logger.info("✓ Event Bus initialized")
@@ -232,7 +259,7 @@ async def lifespan(app: FastAPI):
             lambda: event_bus.running
         )
         
-        # STEP 4: Initialize database (Phase 2)
+        # STEP 5: Initialize database (Phase 2)
         logger.info("Initializing PostgreSQL database...")
         try:
             is_db_ready = await init_database()
@@ -246,7 +273,7 @@ async def lifespan(app: FastAPI):
             if settings.ENV == "production":
                 raise
         
-        # STEP 5: Initialize Kafka event streaming (Phase 2)
+        # STEP 6: Initialize Kafka event streaming (Phase 2)
         logger.info("Initializing Kafka event streaming...")
         try:
             is_kafka_ready = await initialize_event_streaming()
@@ -260,7 +287,7 @@ async def lifespan(app: FastAPI):
             if settings.ENV == "production":
                 raise
         
-        # STEP 6: Initialize incident detection engine (Phase 2)
+        # STEP 7: Initialize incident detection engine (Phase 2)
         logger.info("Initializing incident detection engine...")
         try:
             detection_rules = detection_engine.get_active_rules()
@@ -272,7 +299,7 @@ async def lifespan(app: FastAPI):
         except Exception as e:
             logger.error(f"✗ Detection engine initialization failed: {e}")
         
-        # STEP 7: Initialize Prometheus monitoring (Phase 2)
+        # STEP 8: Initialize Prometheus monitoring (Phase 2)
         logger.info("Initializing Prometheus monitoring...")
         try:
             metrics_count = len(monitoring.metrics)
@@ -284,7 +311,7 @@ async def lifespan(app: FastAPI):
         except Exception as e:
             logger.error(f"✗ Monitoring initialization failed: {e}")
         
-        # STEP 8: Run health checks
+        # STEP 9: Run health checks
         logger.info("Running dependency health checks...")
         is_system_ready = await initialize_health_checks()
         
@@ -297,7 +324,7 @@ async def lifespan(app: FastAPI):
         startup_status = startup_verifier.get_startup_status()
         logger.info(f"Startup completed in {startup_status['startup_duration_ms']}ms")
         
-        # STEP 10: Log available security features
+        # STEP 11: Log available security features
         coverage = mitre_framework.get_coverage_summary()
         logger.info(
             f"MITRE ATT&CK Framework: {coverage['total_techniques']} techniques, "
@@ -315,6 +342,22 @@ async def lifespan(app: FastAPI):
     
     # SHUTDOWN SEQUENCE
     logger.info("🛑 Shutting down...")
+    
+    # Stop watchdog first (to prevent restarts during shutdown)
+    try:
+        if hasattr(app.state, 'watchdog'):
+            app.state.watchdog.stop()
+            logger.info("✓ Module watchdog stopped")
+    except Exception as e:
+        logger.error(f"Error stopping watchdog: {e}")
+    
+    # Shutdown unified event pipeline
+    try:
+        if hasattr(app.state, 'unified_event_pipeline'):
+            await app.state.unified_event_pipeline.shutdown()
+            logger.info("✓ Unified event pipeline shutdown")
+    except Exception as e:
+        logger.error(f"Error shutting down unified event pipeline: {e}")
     
     try:
         await event_bus.disconnect()
@@ -380,7 +423,6 @@ async def health_check():
 async def liveness_probe():
     """Kubernetes liveness probe - is the process alive?"""
     is_alive = health_checker.get_liveness_status()
-    status_code = 200 if is_alive else 503
     
     return {
         "status": "alive" if is_alive else "dead",
@@ -392,7 +434,6 @@ async def liveness_probe():
 async def readiness_probe():
     """Kubernetes readiness probe - can it serve traffic?"""
     is_ready, reason = health_checker.get_readiness_status()
-    status_code = 200 if is_ready else 503
     
     return {
         "ready": is_ready,
@@ -411,6 +452,19 @@ async def detailed_status():
 async def startup_status():
     """Startup sequence status"""
     return startup_verifier.get_startup_status()
+
+
+@app.get("/health/services")
+async def services_status():
+    """Service monitoring status from watchdog"""
+    if hasattr(app.state, 'watchdog'):
+        return app.state.watchdog.get_status()
+    else:
+        return {
+            "error": "Watchdog not initialized",
+            "watchdog_running": False,
+            "services": {}
+        }
 
 
 # ========================

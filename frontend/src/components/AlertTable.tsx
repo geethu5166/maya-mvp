@@ -1,17 +1,16 @@
 ﻿import { SecurityEvent } from "../types"
-import { ChevronRight, Zap, Search } from "lucide-react"
-import { getSeverityBadgeColor, formatDate, getTimeAgo } from "../utils/classnames"
+import { ChevronRight, Search } from "lucide-react"
+import { getSeverityBadgeColor, getTimeAgo } from "../utils/classnames"
 import { useState } from "react"
 
 interface AlertTableProps {
   events: SecurityEvent[]
   onSelectEvent?: (event: SecurityEvent) => void
-  loading?: boolean
 }
 
-export default function AlertTable({ events, onSelectEvent, loading = false }: AlertTableProps) {
+export default function AlertTable({ events, onSelectEvent }: AlertTableProps) {
   const [filter, setFilter] = useState("")
-  const [sortBy, setSortBy] = useState<"time" | "severity">("time")
+  const [sortBy] = useState<"time" | "severity">("time")
 
   const filteredEvents = events.filter(e =>
     e.event_type.toLowerCase().includes(filter.toLowerCase()) ||
@@ -65,7 +64,7 @@ export default function AlertTable({ events, onSelectEvent, loading = false }: A
           </thead>
           <tbody>
             {sortedEvents.map((event) => (
-              <tr key={event.id} className="border-b border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer" onClick={() => onSelectEvent?.(event)}>
+              <tr key={event.event_id} className="border-b border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer" onClick={() => onSelectEvent?.(event)}>
                 <td className="px-6 py-4 text-sm text-slate-900 dark:text-white">{event.event_type}</td>
                 <td className="px-6 py-4 text-sm">
                   <span className={`px-2 py-1 rounded text-xs font-medium ${getSeverityBadgeColor(event.severity)}`}>

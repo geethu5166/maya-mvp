@@ -161,11 +161,11 @@ fi
 echo ""
 
 # API health check
-log_info "API Health: $SUBDOMAIN/api/v1/health"
-if timeout 10 curl -s -k https://$SUBDOMAIN/api/v1/health --max-time 5 | grep -q "status"; then
+log_info "API Health: $SUBDOMAIN/health/services"
+if timeout 10 curl -s -k https://$SUBDOMAIN/health/services --max-time 5 | grep -q "watchdog_running\|services"; then
     log_success "API responding"
 else
-    log_warning "API not responding (backend may not be running)"
+    log_warning "API health endpoint not responding (backend may not be running)"
 fi
 
 echo ""

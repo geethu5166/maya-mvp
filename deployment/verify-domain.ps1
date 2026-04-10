@@ -119,7 +119,7 @@ Write-Host ""
 # Health check
 Write-Info "Health Check: https://$SUBDOMAIN/health"
 try {
-    $response = Invoke-WebRequest -Uri "https://$SUBDOMAIN/health" -TimeoutSec 5 -SkipCertificateCheck
+    $response = Invoke-WebRequest -Uri "https://$SUBDOMAIN/health" -TimeoutSec 5
     if ($response.Content -like "*healthy*" -or $response.StatusCode -eq 200) {
         Write-Success "Health check endpoint responding"
     } else {
@@ -132,9 +132,9 @@ try {
 Write-Host ""
 
 # API health
-Write-Info "API Health: https://$SUBDOMAIN/api/v1/health"
+Write-Info "API Health: https://$SUBDOMAIN/health/services"
 try {
-    $response = Invoke-WebRequest -Uri "https://$SUBDOMAIN/api/v1/health" -TimeoutSec 5 -SkipCertificateCheck
+    $response = Invoke-WebRequest -Uri "https://$SUBDOMAIN/health/services" -TimeoutSec 5
     if ($response.StatusCode -eq 200) {
         Write-Success "API health endpoint responding"
     } else {
@@ -152,7 +152,7 @@ Write-Host ""
 
 Write-Info "Frontend: https://$SUBDOMAIN"
 try {
-    $response = Invoke-WebRequest -Uri "https://$SUBDOMAIN" -TimeoutSec 5 -SkipCertificateCheck
+    $response = Invoke-WebRequest -Uri "https://$SUBDOMAIN" -TimeoutSec 5
     if ($response.Content -like "*React*" -or $response.Content -like "*html*" -or $response.StatusCode -eq 200) {
         Write-Success "Frontend is responding"
     } else {

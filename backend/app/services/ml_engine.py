@@ -329,6 +329,162 @@ class RiskScoringEngine:
         return risk_score, risk_level
 
 
+class BehavioralClusterer:
+    """DBSCAN-based behavioral clustering for event grouping"""
+    
+    def __init__(self, eps: float = 0.5, min_samples: int = 5):
+        """
+        Initialize behavioral clusterer.
+        
+        Args:
+            eps: DBSCAN epsilon (neighborhood radius)
+            min_samples: Minimum samples to form a cluster
+        """
+        self.eps = eps
+        self.min_samples = min_samples
+        self.clusterer = DBSCAN(eps=eps, min_samples=min_samples)
+        self.scaler = StandardScaler()
+        self.event_history = []
+        self.cluster_assignments = {}
+        self.is_fitted = False
+    
+    def _extract_behavioral_features(self, events: List[Dict[str, Any]]) -> np.ndarray:
+        """
+        Extract behavioral features from events for clustering.
+        
+        Features:
+        - Time-based patterns
+        - Source IP frequency
+        - Severity patterns
+        - Event type diversity
+        """
+        features_list = []
+        
+        for event in events:
+            # Time-based feature (hour of day normalized)
+            timestamp = event.get('timestamp', '')
+            hour = 0
+            if timestamp:
+                try:
+                    from datetime import datetime as dt
+                    parsed_time = dt.fromisoformat(timestamp)
+                    hour = parsed_time.hour / 24.0  # Normalize to 0-1
+                except:
+                    hour = 0.5
+            
+            # Severity feature (0-1)
+            severity_map = {'CRITICAL': 1.0, 'HIGH': 0.75, 'MEDIUM': 0.5, 'LOW': 0.25, 'INFO': 0.1}
+            severity = severity_map.get(event.get('severity', 'INFO'), 0.5)
+            
+            # Source IP octet variance (to detect similar sources)
+            source_ip = event.get('source_ip', '0.0.0.0')
+            ip_variance = sum(int(x) for x in source_ip.split('.') if x.isdigit()) / 1020.0 if source_ip else 0.5
+            
+            # Event type encoded
+            event_type = event.get('event_type', 'UNKNOWN')
+            event_type_code = {
+                'SSH_BRUTE_FORCE': 0.2,
+                'WEB_SCAN': 0.4,
+                'DB_PROBE': 0.6,
+                'ANOMALY': 0.8,
+                'HONEYPOT_INTERACTION': 1.0,
+            }.get(event_type, 0.5)
+            
+            # Metadata complexity
+            metadata_size = len(str(event.get('metadata', {}))) / 500.0
+            metadata_complexity = min(metadata_size, 1.0)
+            
+            features = [hour, severity, ip_variance, event_type_code, metadata_complexity]
+            features_list.append(features)
+        
+        return np.array(features_list) if features_list else np.array([])
+    
+    async def add_events(self, events: List[Dict[str, Any]]) -> None:
+        """Add events to clustering history"""
+        self.event_history.extend(events)
+        # Keep only last 1000 events for performance
+        if len(self.event_history) > 1000:
+            self.event_history = self.event_history[-1000:]
+    
+    async def cluster_events(self) -> bool:
+        """
+        Cluster events using DBSCAN.
+        
+        Returns:
+            Success status
+        """
+        if len(self.event_history) < self.min_samples:
+            logger.debug(f"Need at least {self.min_samples} events to cluster")
+            return False
+        
+        try:
+            # Extract features
+            features = self._extract_behavioral_features(self.event_history)
+            
+            if features.size == 0:
+                return False
+            
+            # Scale features
+            X = self.scaler.fit_transform(features)
+            
+            # Fit clusterer
+            labels = self.clusterer.fit_predict(X)
+            
+            # Store assignments
+            self.cluster_assignments = {
+                i: int(label) for i, label in enumerate(labels)
+            }
+            
+            self.is_fitted = True
+            
+            num_clusters = len(set(labels)) - (1 if -1 in labels else 0)
+            num_noise = list(labels).count(-1)
+            logger.info(f"✓ Behavioral clustering: {num_clusters} clusters, {num_noise} noise points")
+            
+            return True
+        except Exception as e:
+            logger.error(f"✗ Clustering failed: {e}")
+            return False
+    
+    async def get_cluster(self, event: Dict[str, Any]) -> int:
+        """
+        Get cluster ID for a new event.
+        
+        Returns:
+            Cluster ID (-1 for noise/singleton)
+        """
+        if not self.is_fitted or len(self.event_history) == 0:
+            return -1
+        
+        try:
+            # Extract features for single event
+            features = self._extract_behavioral_features([event])
+            X = self.scaler.transform(features)
+            
+            # Predict cluster (returns closest cluster or -1 for noise)
+            # For DBSCAN, we need to find the closest cluster centroid
+            distances = []
+            for i, cluster_id in self.cluster_assignments.items():
+                if cluster_id != -1:  # Skip noise points
+                    # Distance to this historical point
+                    hist_features = self._extract_behavioral_features([self.event_history[i]])
+                    hist_X = self.scaler.transform(hist_features)
+                    dist = np.linalg.norm(X - hist_X)
+                    distances.append((dist, cluster_id))
+            
+            if distances:
+                distances.sort()
+                closest_distance, closest_cluster = distances[0]
+                # If close enough, assign to cluster
+                if closest_distance <= self.eps:
+                    return int(closest_cluster)
+            
+            return -1  # Noise point
+        except Exception as e:
+            logger.debug(f"Cluster prediction failed: {e}")
+            return -1
+
+
 class EntityDeduplicator:
     """Fuzzy matching-based entity deduplication"""
     
@@ -405,6 +561,7 @@ class MLEngineService:
         self.threat_classifier = ThreatClassifier(num_classes=6)
         self.risk_scorer = RiskScoringEngine()
         self.entity_deduplicator = EntityDeduplicator(threshold=0.85)
+        self.behavioral_clusterer = BehavioralClusterer(eps=0.5, min_samples=5)
         self.last_training = None
         self.training_interval = timedelta(hours=1)
     
@@ -435,7 +592,10 @@ class MLEngineService:
             source_ip = event.get('source_ip', '')
             is_duplicate, matched_ip, similarity = await self.entity_deduplicator.find_duplicate(source_ip)
             
-            # Step 5: Generate recommendation
+            # Step 5: Behavioral clustering
+            behavioral_cluster = await self.behavioral_clusterer.get_cluster(event)
+            
+            # Step 6: Generate recommendation
             recommendation = self._generate_recommendation(risk_level, threat_type, is_anomaly)
             
             return MLPrediction(
@@ -445,7 +605,7 @@ class MLEngineService:
                 threat_confidence=threat_confidence,
                 risk_score=risk_score,
                 risk_level=risk_level,
-                behavioral_cluster=-1,  # TODO: Implement clustering
+                behavioral_cluster=behavioral_cluster,
                 is_duplicate=is_duplicate,
                 duplicate_similarity=similarity,
                 recommendation=recommendation
@@ -487,8 +647,12 @@ class MLEngineService:
             labels = [e.get('event_type', 'UNKNOWN') for e in events]
             await self.threat_classifier.train(events, labels)
             
+            # Train behavioral clusterer
+            await self.behavioral_clusterer.add_events(events)
+            await self.behavioral_clusterer.cluster_events()
+            
             self.last_training = datetime.now()
-            logger.info("✓ All ML models trained successfully")
+            logger.info("✓ All ML models trained successfully (anomaly, classifier, clusterer)")
             return True
         except Exception as e:
             logger.error(f"Training failed: {e}")
