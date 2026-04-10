@@ -164,6 +164,9 @@ services:
       API_LOG_LEVEL: ${LOG_LEVEL:-INFO}
       
       # Security (Phase 2)
+      SECRET_KEY: ${SECRET_KEY:-${JWT_SECRET_KEY:-change_this_in_production_please_32_chars}}
+      INIT_ADMIN_USERNAME: ${INIT_ADMIN_USERNAME:-admin}
+      INIT_ADMIN_PASSWORD: ${INIT_ADMIN_PASSWORD:-ChangeThisAdminPass123!}
       JWT_SECRET_KEY: ${JWT_SECRET_KEY:-change_this_in_production}
       JWT_ALGORITHM: HS256
       JWT_EXPIRATION_HOURS: 24
