@@ -217,6 +217,12 @@ async def lifespan(app: FastAPI):
                 raise
             else:
                 logger.warning("⚠ Proceeding in degraded mode (set STARTUP_STRICT=true to enforce)")
+
+        if settings.STARTUP_MINIMAL:
+            logger.warning("⚠ STARTUP_MINIMAL=true: skipping external dependency initialization")
+            logger.info(f"✓ {settings.APP_NAME} ready in minimal mode")
+            yield
+            return
         
         # STEP 1.5: Initialize Unified Event Pipeline
         logger.info("Initializing unified security event pipeline...")

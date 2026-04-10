@@ -21,6 +21,7 @@ class Settings(BaseSettings):
     ENV: str = os.getenv("ENV", "development")
     DEBUG: bool = os.getenv("DEBUG", "false").lower() == "true"
     STARTUP_STRICT: bool = os.getenv("STARTUP_STRICT", "false").lower() == "true"
+    STARTUP_MINIMAL: bool = os.getenv("STARTUP_MINIMAL", "true").lower() == "true"
     
     API_V1_PREFIX: str = "/api/v1"
     API_HOST: str = os.getenv("API_HOST", "0.0.0.0")

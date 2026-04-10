@@ -134,6 +134,7 @@ services:
       ENV: ${ENV:-development}
       DEBUG: ${DEBUG:-False}
       STARTUP_STRICT: ${STARTUP_STRICT:-false}
+      STARTUP_MINIMAL: ${STARTUP_MINIMAL:-true}
       APP_NAME: "MAYA SOC Enterprise"
       APP_VERSION: "2.0.0"
       
