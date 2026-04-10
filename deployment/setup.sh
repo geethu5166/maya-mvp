@@ -4,7 +4,7 @@
 # MAYA SOC ENTERPRISE - INITIAL SETUP SCRIPT
 # ============================================
 # Prepares a fresh DigitalOcean droplet for deployment
-# Usage: sudo bash <(curl -s https://raw.githubusercontent.com/YOUR_USERNAME/maya-soc-enterprise/main/deployment/setup.sh)
+# Usage: sudo bash <(curl -s https://raw.githubusercontent.com/YOUR_USERNAME/maya-mvp/main/deployment/setup.sh)
 # Or: sudo ./setup.sh
 
 set -e

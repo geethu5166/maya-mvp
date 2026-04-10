@@ -6,7 +6,9 @@
 # Real-time monitoring of services
 # Usage: ./monitor.sh
 
-PROJECT_DIR="/root/maya-soc-enterprise"
+PROJECT_DIR="/root/maya-mvp"
+DB_USER="${POSTGRES_USER:-soc_user}"
+DB_NAME="${POSTGRES_DB:-maya_soc}"
 
 # Colors
 GREEN='\033[0;32m'
@@ -100,7 +102,7 @@ show_logs_summary() {
 show_api_health() {
     echo -e "${BLUE}━━━ API HEALTH CHECK ━━━${NC}"
     
-    if curl -s -f http://localhost:8000/api/v1/health > /dev/null 2>&1; then
+    if curl -s -f http://localhost:8000/health > /dev/null 2>&1; then
         echo -e "${GREEN}✓${NC} Backend API is responding"
     else
         echo -e "${RED}✗${NC} Backend API is not responding"
@@ -118,12 +120,12 @@ show_database_stats() {
     echo -e "${BLUE}━━━ DATABASE STATS ━━━${NC}"
     cd "$PROJECT_DIR"
     
-    conn_count=$(docker compose exec -T db psql -U maya_user -d maya_soc -c "SELECT count(*) FROM pg_stat_activity;" 2>/dev/null | grep -o "[0-9]\+" | head -1)
+    conn_count=$(docker compose exec -T db psql -U "$DB_USER" -d "$DB_NAME" -c "SELECT count(*) FROM pg_stat_activity;" 2>/dev/null | grep -o "[0-9]\+" | head -1)
     if [ -n "$conn_count" ]; then
         echo "Active connections: $conn_count"
     fi
     
-    size=$(docker compose exec -T db psql -U maya_user -d maya_soc -c "SELECT pg_size_pretty(pg_database_size('maya_soc'));" 2>/dev/null | grep -v "pg_size_pretty" | tr -d ' ')
+    size=$(docker compose exec -T db psql -U "$DB_USER" -d "$DB_NAME" -c "SELECT pg_size_pretty(pg_database_size('$DB_NAME'));" 2>/dev/null | grep -v "pg_size_pretty" | tr -d ' ')
     if [ -n "$size" ]; then
         echo "Database size: $size"
     fi

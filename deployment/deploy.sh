@@ -57,6 +57,8 @@ PROJECT_DIR="/root/maya-mvp"
 BACKUP_DIR="/root/backups"
 DOMAIN="maya.vaultrap.com"
 EMAIL="your-email@example.com"
+DB_USER="${POSTGRES_USER:-soc_user}"
+DB_NAME="${POSTGRES_DB:-maya_soc}"
 
 log_info "Configuration:"
 log_info "  Project Directory: $PROJECT_DIR"
@@ -75,7 +77,7 @@ if [ -f "$PROJECT_DIR/docker-compose.yml" ]; then
     
     if docker compose ps | grep -q "db"; then
         log_info "Backing up database..."
-        docker compose exec -T db pg_dump -U maya_user maya_soc 2>/dev/null | gzip > "$BACKUP_FILE" || {
+        docker compose exec -T db pg_dump -U "$DB_USER" "$DB_NAME" 2>/dev/null | gzip > "$BACKUP_FILE" || {
             log_warning "Database backup failed or database not available"
         }
         
@@ -127,7 +129,12 @@ fi
 log_info "Step 5: Building Docker images..."
 
 cd "$PROJECT_DIR"
-docker compose build --no-cache
+if [ "${BUILD_NO_CACHE:-false}" = "true" ]; then
+    log_warning "BUILD_NO_CACHE=true set - performing no-cache build"
+    docker compose build --no-cache
+else
+    docker compose build
+fi
 log_success "Docker images built successfully"
 
 # ============ STEP 6: START SERVICES ============
@@ -147,7 +154,7 @@ sleep 10
 log_info "Checking database health..."
 RETRY=0
 while [ $RETRY -lt 30 ]; do
-    if docker compose exec -T db pg_isready -U maya_user > /dev/null 2>&1; then
+    if docker compose exec -T db pg_isready -U "$DB_USER" > /dev/null 2>&1; then
         log_success "Database is healthy"
         break
     fi
@@ -165,7 +172,7 @@ fi
 log_info "Checking backend health..."
 RETRY=0
 while [ $RETRY -lt 30 ]; do
-    if docker compose exec backend curl -f http://localhost:8000/api/v1/health > /dev/null 2>&1; then
+    if docker compose exec backend curl -f http://localhost:8000/health > /dev/null 2>&1; then
         log_success "Backend is healthy"
         break
     fi
@@ -192,7 +199,7 @@ echo ""
 log_info "Testing endpoints:"
 
 # Test backend health
-if curl -f http://localhost:8000/api/v1/health > /dev/null 2>&1; then
+if curl -f http://localhost:8000/health > /dev/null 2>&1; then
     log_success "Backend health endpoint: OK"
 else
     log_warning "Backend health endpoint: FAILED"

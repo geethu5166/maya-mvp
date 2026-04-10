@@ -4,7 +4,7 @@
 
 ### Check Everything Works
 ```bash
-cd /root/maya-soc-enterprise
+cd /root/maya-mvp
 
 # See all service status
 docker compose ps
@@ -13,7 +13,7 @@ docker compose ps
 docker compose logs
 
 # Test backend
-curl http://localhost:8000/api/v1/health
+curl http://localhost:8000/health
 
 # Test frontend
 curl http://localhost:5173
@@ -78,13 +78,13 @@ docker compose logs db
 
 1. **Check database is running**
    ```bash
-   docker compose exec db psql -U maya_user -d maya_soc -c "SELECT 1;"
+   docker compose exec db psql -U soc_user -d maya_soc -c "SELECT 1;"
    ```
 
 2. **Verify credentials in .env**
    ```bash
    # Check these variables in .env:
-   POSTGRES_USER=maya_user
+   POSTGRES_USER=soc_user
    POSTGRES_PASSWORD=[should not be blank]
    POSTGRES_DB=maya_soc
    ```
@@ -92,7 +92,7 @@ docker compose logs db
 3. **Reinitialize database**
    ```bash
    docker compose down
-   docker volume rm maya-soc-enterprise_postgres_data
+   docker volume rm maya-mvp_postgres_data
    docker compose up -d db
    ```
 
@@ -100,7 +100,7 @@ docker compose logs db
    ```bash
    # Restore from latest backup
    LATEST_BACKUP=$(ls -t /root/backups/*.sql.gz | head -1)
-   docker compose exec -T db psql -U maya_user < <(gunzip -c $LATEST_BACKUP)
+   docker compose exec -T db psql -U soc_user < <(gunzip -c $LATEST_BACKUP)
    ```
 
 ---
@@ -113,14 +113,14 @@ docker compose logs db
 ```bash
 docker compose logs backend
 docker compose ps backend
-curl http://localhost:8000/api/v1/health
+curl http://localhost:8000/health
 ```
 
 **Solutions**:
 
 1. **Check backend is running**
    ```bash
-   docker compose exec backend curl http://localhost:8000/api/v1/health
+   docker compose exec backend curl http://localhost:8000/health
    ```
 
 2. **Check backend logs for errors**
@@ -149,13 +149,13 @@ curl http://localhost:8000/api/v1/health
 
 ### ❌ Frontend Not Loading
 
-**Problem**: Blank page or cannot reach app.vaultrap.com
+**Problem**: Blank page or cannot reach maya.vaultrap.com
 
 **Diagnosis**:
 ```bash
 docker compose logs frontend
 curl http://localhost:5173
-curl https://app.vaultrap.com
+curl https://maya.vaultrap.com
 ```
 
 **Solutions**:
@@ -174,15 +174,15 @@ curl https://app.vaultrap.com
 
 3. **Verify DNS/Domain**
    ```bash
-   nslookup app.vaultrap.com
-   ping app.vaultrap.com
-   curl -v https://app.vaultrap.com
+   nslookup maya.vaultrap.com
+   ping maya.vaultrap.com
+   curl -v https://maya.vaultrap.com
    ```
 
 4. **Check SSL certificate**
    ```bash
    certbot certificates
-   ls -la /etc/letsencrypt/live/app.vaultrap.com/
+   ls -la /etc/letsencrypt/live/maya.vaultrap.com/
    ```
 
 5. **Restart Nginx**
@@ -230,7 +230,7 @@ docker compose logs backend | grep -i "memory\|cpu"
 5. **Query optimization**
    ```bash
    # Check slow queries
-   docker compose exec db psql -U maya_user -d maya_soc << EOF
+   docker compose exec db psql -U soc_user -d maya_soc << EOF
    SELECT * FROM pg_stat_statements 
    ORDER BY total_time DESC LIMIT 10;
    EOF
@@ -322,8 +322,8 @@ docker compose ps kafka redis
 **Diagnosis**:
 ```bash
 certbot certificates
-ls -la /etc/letsencrypt/live/app.vaultrap.com/
-ssl_client -connect app.vaultrap.com:443
+ls -la /etc/letsencrypt/live/maya.vaultrap.com/
+ssl_client -connect maya.vaultrap.com:443
 ```
 
 **Solutions**:
@@ -331,7 +331,7 @@ ssl_client -connect app.vaultrap.com:443
 1. **Check certificate is valid**
    ```bash
    certbot certificates
-   openssl x509 -in /etc/letsencrypt/live/app.vaultrap.com/fullchain.pem -text -noout
+   openssl x509 -in /etc/letsencrypt/live/maya.vaultrap.com/fullchain.pem -text -noout
    ```
 
 2. **Manually renew certificate**
@@ -435,7 +435,7 @@ docker compose restart backend
 ### Database Performance Analysis
 ```bash
 # Connect to database
-docker compose exec db psql -U maya_user -d maya_soc
+docker compose exec db psql -U soc_user -d maya_soc
 
 # List slow queries
 SELECT * FROM pg_stat_statements ORDER BY total_time DESC LIMIT 10;
@@ -492,8 +492,8 @@ echo "Debug bundle created in /root/debug/"
 ```bash
 # Create support package
 tar -czf /root/maya-support-$(date +%Y%m%d_%H%M%S).tar.gz \
-  /root/maya-soc-enterprise/docker-compose.yml \
-  /root/maya-soc-enterprise/.env.example \
+  /root/maya-mvp/docker-compose.yml \
+  /root/maya-mvp/.env.example \
   /var/lib/docker/containers/*/config.v2.json
 ```
 
@@ -505,8 +505,8 @@ tar -czf /root/maya-support-$(date +%Y%m%d_%H%M%S).tar.gz \
 ```bash
 # WARNING: This will delete all data!
 docker compose down
-docker volume rm maya-soc-enterprise_postgres_data
-docker volume rm maya-soc-enterprise_redis_data
+docker volume rm maya-mvp_postgres_data
+docker volume rm maya-mvp_redis_data
 docker system prune -a
 docker compose up -d
 ```
@@ -518,12 +518,12 @@ ls -lah /root/backups/
 
 # Restore latest
 LATEST=$(ls -t /root/backups/*.sql.gz | head -1)
-gunzip -c $LATEST | docker compose exec -T db psql -U maya_user -d maya_soc
+gunzip -c $LATEST | docker compose exec -T db psql -U soc_user -d maya_soc
 ```
 
 ### Restart from Clean State
 ```bash
-cd /root/maya-soc-enterprise
+cd /root/maya-mvp
 git reset --hard origin/main
 git pull
 docker compose build --no-cache
@@ -537,13 +537,13 @@ docker compose up -d
 After making changes, verify everything works:
 
 - [ ] All containers running: `docker compose ps` (all "UP")
-- [ ] Backend responding: `curl http://localhost:8000/api/v1/health`
+- [ ] Backend responding: `curl http://localhost:8000/health`
 - [ ] Frontend loading: `curl http://localhost:5173`
-- [ ] Database connecting: `docker compose exec db psql -U maya_user -d maya_soc -c "SELECT 1;"`
+- [ ] Database connecting: `docker compose exec db psql -U soc_user -d maya_soc -c "SELECT 1;"`
 - [ ] Logs clean: `docker compose logs | grep -i error` (no errors)
 - [ ] No high resource usage: `docker stats --no-stream`
 - [ ] Disk space available: `df -h` (>10% free)
-- [ ] Application accessible: `curl https://app.vaultrap.com`
+- [ ] Application accessible: `curl https://maya.vaultrap.com`
 
 ---
 

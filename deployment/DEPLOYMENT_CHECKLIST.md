@@ -11,7 +11,7 @@
 ### Infrastructure Setup
 - [ ] DigitalOcean account created
 - [ ] Droplet provisioned (minimum $5/month)
-- [ ] Domain registered (app.vaultrap.com)
+- [ ] Domain registered (maya.vaultrap.com)
 - [ ] DNS records pointing to droplet IP
 - [ ] SSH access configured
 - [ ] Firewall rules configured (22, 80, 443 open)
@@ -47,7 +47,7 @@
 
 **Step 2: Run Setup Script** (15 min)
 ```bash
-sudo bash /root/maya-soc-enterprise/deployment/setup.sh
+sudo bash /root/maya-mvp/deployment/setup.sh
 ```
 - [ ] Docker installed
 - [ ] Docker Compose installed
@@ -57,30 +57,30 @@ sudo bash /root/maya-soc-enterprise/deployment/setup.sh
 
 **Step 3: Configure Environment** (10 min)
 ```bash
-nano /root/maya-soc-enterprise/.env
+nano /root/maya-mvp/.env
 ```
 - [ ] Set POSTGRES_PASSWORD
 - [ ] Set REDIS_PASSWORD  
 - [ ] Set SECRET_KEY
-- [ ] Set DOMAIN=app.vaultrap.com
+- [ ] Set DOMAIN=maya.vaultrap.com
 - [ ] Save and exit
 
 **Step 4: Generate SSL Certificate** (10 min)
 ```bash
-certbot certonly --standalone -d app.vaultrap.com --email your-email@example.com --agree-tos
+certbot certonly --standalone -d maya.vaultrap.com --email your-email@example.com --agree-tos
 ```
 - [ ] Certificate generated successfully
-- [ ] Located at /etc/letsencrypt/live/app.vaultrap.com/
+- [ ] Located at /etc/letsencrypt/live/maya.vaultrap.com/
 
 **Step 5: Start Deployment** (30 min)
 ```bash
-sudo /root/maya-soc-enterprise/deployment/deploy.sh
+sudo /root/maya-mvp/deployment/deploy.sh
 ```
 - [ ] All services starting
 - [ ] No critical errors in logs
 - [ ] Database initialized
 
-**Result**: ✅ Application should be accessible at https://app.vaultrap.com
+**Result**: ✅ Application should be accessible at https://maya.vaultrap.com
 
 ---
 
@@ -96,7 +96,7 @@ docker compose logs -f
 - [ ] Services are healthy
 
 **Step 2: Test Frontend** (5 min)
-- [ ] Access https://app.vaultrap.com
+- [ ] Access https://maya.vaultrap.com
 - [ ] Login with admin/admin123
 - [ ] Dashboard loads
 - [ ] Real-time data flowing
@@ -104,8 +104,8 @@ docker compose logs -f
 
 **Step 3: Test API** (5 min)
 ```bash
-curl https://app.vaultrap.com/api/v1/health
-curl https://app.vaultrap.com/api/v1/incidents
+curl https://maya.vaultrap.com/health
+curl https://maya.vaultrap.com/api/v1/incidents
 ```
 - [ ] API endpoints responding
 - [ ] Authentication working
@@ -113,7 +113,7 @@ curl https://app.vaultrap.com/api/v1/incidents
 
 **Step 4: Test Database** (5 min)
 ```bash
-docker compose exec db psql -U maya_user -d maya_soc -c "SELECT count(*) FROM incidents;"
+docker compose exec db psql -U soc_user -d maya_soc -c "SELECT count(*) FROM incidents;"
 ```
 - [ ] Database connections working
 - [ ] Data persisting
@@ -121,7 +121,7 @@ docker compose exec db psql -U maya_user -d maya_soc -c "SELECT count(*) FROM in
 
 **Step 5: Test Backups** (5 min)
 ```bash
-/root/maya-soc-enterprise/deployment/backup.sh
+/root/maya-mvp/deployment/backup.sh
 ls -lh /root/backups/
 ```
 - [ ] Backup created successfully
@@ -130,7 +130,7 @@ ls -lh /root/backups/
 
 **Step 6: Monitoring** (5 min)
 ```bash
-/root/maya-soc-enterprise/deployment/monitor.sh
+/root/maya-mvp/deployment/monitor.sh
 ```
 - [ ] All services healthy
 - [ ] Resource usage normal
@@ -198,19 +198,19 @@ ls -lh /root/backups/
 ## 🆔 Access Credentials
 
 ### Initial Login
-- **URL**: https://app.vaultrap.com
+- **URL**: https://maya.vaultrap.com
 - **Username**: admin
 - **Password**: (from INIT_ADMIN_PASSWORD in .env)
 
 ### Server Access
 ```bash
-ssh root@app.vaultrap.com
+ssh root@maya.vaultrap.com
 # Or via DigitalOcean console
 ```
 
 ### Database (if needed)
 ```bash
-docker exec -it maya-db psql -U maya_user -d maya_soc
+docker exec -it maya-db psql -U soc_user -d maya_soc
 ```
 
 ---
@@ -219,9 +219,9 @@ docker exec -it maya-db psql -U maya_user -d maya_soc
 
 | Service | URL | Port | Purpose |
 |---------|-----|------|---------|
-| Frontend | https://app.vaultrap.com | 443 | Web interface |
-| API | https://app.vaultrap.com/api/v1 | 443 | REST API |
-| Health | https://app.vaultrap.com/health | 443 | Status check |
+| Frontend | https://maya.vaultrap.com | 443 | Web interface |
+| API | https://maya.vaultrap.com/api/v1 | 443 | REST API |
+| Health | https://maya.vaultrap.com/health | 443 | Status check |
 | Backend (internal) | http://localhost:8000 | 8000 | FastAPI |
 | Frontend (internal) | http://localhost:5173 | 5173 | Vite dev |
 | PostgreSQL | localhost | 5432 | Database |
@@ -240,8 +240,8 @@ docker exec -it maya-db psql -U maya_user -d maya_soc
 
 ## 📞 Support Resources
 
-- **Documentation**: `/root/maya-soc-enterprise/COMPLETE_DEPLOYMENT_GUIDE.md`
-- **Troubleshooting**: `/root/maya-soc-enterprise/deployment/TROUBLESHOOTING.md`
+- **Documentation**: `/root/maya-mvp/COMPLETE_DEPLOYMENT_GUIDE.md`
+- **Troubleshooting**: `/root/maya-mvp/deployment/TROUBLESHOOTING.md`
 - **Logs**: `docker compose logs -f`
 - **Status**: `docker compose ps`
 - **Commands**: See Quick Reference below
@@ -252,8 +252,8 @@ docker exec -it maya-db psql -U maya_user -d maya_soc
 
 ### Deployment
 ```bash
-cd /root/maya-soc-enterprise
-sudo /root/maya-soc-enterprise/deployment/deploy.sh
+cd /root/maya-mvp
+sudo /root/maya-mvp/deployment/deploy.sh
 ```
 
 ### Start/Stop Services
@@ -276,14 +276,14 @@ docker compose logs --tail 50 # Last 50 lines
 ```bash
 docker compose ps             # Service status
 docker stats                  # Resource usage
-/root/maya-soc-enterprise/deployment/monitor.sh
+/root/maya-mvp/deployment/monitor.sh
 df -h                        # Disk space
 free -h                      # Memory
 ```
 
 ### Database
 ```bash
-docker compose exec db psql -U maya_user -d maya_soc
+docker compose exec db psql -U soc_user -d maya_soc
 # Inside psql:
 SELECT count(*) FROM incidents;
 \dt                          # List tables
@@ -292,7 +292,7 @@ SELECT count(*) FROM incidents;
 
 ### Backups
 ```bash
-/root/maya-soc-enterprise/deployment/backup.sh
+/root/maya-mvp/deployment/backup.sh
 ls -lah /root/backups/
 ```
 
@@ -300,7 +300,7 @@ ls -lah /root/backups/
 ```bash
 docker compose logs backend | grep -i error
 docker compose exec backend curl http://localhost:8000/health
-curl https://app.vaultrap.com/health
+curl https://maya.vaultrap.com/health
 ```
 
 ---

@@ -9,10 +9,12 @@
 set -e
 
 BACKUP_DIR="/root/backups"
-PROJECT_DIR="/root/maya-soc-enterprise"
+PROJECT_DIR="/root/maya-mvp"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 BACKUP_FILE="$BACKUP_DIR/maya_soc_$TIMESTAMP.sql.gz"
 RETENTION_DAYS=30
+DB_USER="${POSTGRES_USER:-soc_user}"
+DB_NAME="${POSTGRES_DB:-maya_soc}"
 
 # Colors
 GREEN='\033[0;32m'
@@ -38,7 +40,7 @@ if ! docker compose ps db | grep -q "Up"; then
 fi
 
 log_info "Creating database dump..."
-docker compose exec -T db pg_dump -U maya_user maya_soc | gzip > "$BACKUP_FILE"
+docker compose exec -T db pg_dump -U "$DB_USER" "$DB_NAME" | gzip > "$BACKUP_FILE"
 
 if [ $? -eq 0 ]; then
     SIZE=$(du -h "$BACKUP_FILE" | cut -f1)

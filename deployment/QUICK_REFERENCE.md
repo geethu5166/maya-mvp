@@ -20,22 +20,22 @@ Quick command reference for production deployment and management.
 ### Initial Setup (First Time Only)
 ```bash
 # Run on fresh DigitalOcean droplet
-sudo bash <(curl -s https://raw.githubusercontent.com/YOUR_USERNAME/maya-soc-enterprise/main/deployment/setup.sh)
+sudo bash <(curl -s https://raw.githubusercontent.com/YOUR_USERNAME/maya-mvp/main/deployment/setup.sh)
 
 # Then edit configuration
-nano /root/maya-soc-enterprise/.env
+nano /root/maya-mvp/.env
 
 # Generate SSL certificate
-certbot certonly --standalone -d app.vaultrap.com --email your-email@example.com
+certbot certonly --standalone -d maya.vaultrap.com --email your-email@example.com
 
 # Deploy application
-sudo /root/maya-soc-enterprise/deployment/deploy.sh
+sudo /root/maya-mvp/deployment/deploy.sh
 ```
 
 ### Redeployment (Updates)
 ```bash
 # Pull latest code and redeploy
-sudo /root/maya-soc-enterprise/deployment/deploy.sh
+sudo /root/maya-mvp/deployment/deploy.sh
 
 # What it does:
 # - Backups database
@@ -83,7 +83,7 @@ docker compose up -d backend
 
 ### Connect to Database
 ```bash
-docker compose exec db psql -U maya_user -d maya_soc
+docker compose exec db psql -U soc_user -d maya_soc
 
 # Useful commands inside psql:
 \dt                               # List tables
@@ -94,13 +94,13 @@ SELECT count(*) FROM incidents;   # Count records
 
 ### Database Size
 ```bash
-docker compose exec db psql -U maya_user -d maya_soc -c \
+docker compose exec db psql -U soc_user -d maya_soc -c \
   "SELECT pg_size_pretty(pg_database_size('maya_soc'));"
 ```
 
 ### Active Connections
 ```bash
-docker compose exec db psql -U maya_user -d maya_soc -c \
+docker compose exec db psql -U soc_user -d maya_soc -c \
   "SELECT count(*) FROM pg_stat_activity;"
 ```
 
@@ -193,7 +193,7 @@ netstat -tulpn | grep LISTEN
 
 ### Manual Backup
 ```bash
-/root/maya-soc-enterprise/deployment/backup.sh
+/root/maya-mvp/deployment/backup.sh
 
 # Creates: /root/backups/maya_soc_YYYYMMDD_HHMMSS.sql.gz
 ```
@@ -207,11 +207,11 @@ ls -lah /root/backups/
 ```bash
 # Restore latest backup
 LATEST=$(ls -t /root/backups/*.sql.gz | head -1)
-gunzip -c $LATEST | docker compose exec -T db psql -U maya_user -d maya_soc
+gunzip -c $LATEST | docker compose exec -T db psql -U soc_user -d maya_soc
 
 # Restore specific backup
 BACKUP="/root/backups/maya_soc_20260409_020000.sql.gz"
-gunzip -c $BACKUP | docker compose exec -T db psql -U maya_user -d maya_soc
+gunzip -c $BACKUP | docker compose exec -T db psql -U soc_user -d maya_soc
 ```
 
 ### Schedule Automatic Backup
@@ -221,7 +221,7 @@ gunzip -c $BACKUP | docker compose exec -T db psql -U maya_user -d maya_soc
 crontab -l | grep backup
 
 # Should output:
-# 0 2 * * * /root/maya-soc-enterprise/deployment/backup.sh >> /root/logs/backup.log 2>&1
+# 0 2 * * * /root/maya-mvp/deployment/backup.sh >> /root/logs/backup.log 2>&1
 ```
 
 ---
@@ -249,10 +249,10 @@ docker compose up -d --build
 docker compose ps db
 
 # Test connection
-docker compose exec db psql -U maya_user -d maya_soc -c "SELECT 1;"
+docker compose exec db psql -U soc_user -d maya_soc -c "SELECT 1;"
 
 # Check credentials in .env
-grep POSTGRES /root/maya-soc-enterprise/.env
+grep POSTGRES /root/maya-mvp/.env
 ```
 
 ### Out of Disk Space
@@ -279,7 +279,7 @@ docker compose restart backend
 ### API Not Responding
 ```bash
 # Check backend running
-curl http://localhost:8000/api/v1/health
+curl http://localhost:8000/health
 
 # View errors
 docker compose logs backend | grep -i error
@@ -300,7 +300,7 @@ docker compose ps nginx
 docker compose logs nginx
 
 # Check domain/SSL
-curl -v https://app.vaultrap.com
+curl -v https://maya.vaultrap.com
 ```
 
 ---
@@ -324,8 +324,8 @@ kill -9 <PID>
 ### Complete Reset (Data Loss!)
 ```bash
 docker compose down
-docker volume rm maya-soc-enterprise_postgres_data
-docker volume rm maya-soc-enterprise_redis_data
+docker volume rm maya-mvp_postgres_data
+docker volume rm maya-mvp_redis_data
 docker system prune -a
 docker compose up -d
 ```
@@ -334,7 +334,7 @@ docker compose up -d
 ```bash
 # Restore database
 BACKUP="/root/backups/maya_soc_20260409_020000.sql.gz"
-gunzip -c $BACKUP | docker compose exec -T db psql -U maya_user -d maya_soc
+gunzip -c $BACKUP | docker compose exec -T db psql -U soc_user -d maya_soc
 
 # Restart services
 docker compose restart backend
@@ -346,10 +346,10 @@ docker compose restart backend
 
 | Service | URL | Check Command |
 |---------|-----|---|
-| Frontend | https://app.vaultrap.com | curl -k https://app.vaultrap.com |
-| API | https://app.vaultrap.com/api | curl -k https://app.vaultrap.com/api/v1/health |
-| Health Check | https://app.vaultrap.com/health | curl -k https://app.vaultrap.com/health |
-| Backend Internal | http://localhost:8000 | curl http://localhost:8000/api/v1/health |
+| Frontend | https://maya.vaultrap.com | curl -k https://maya.vaultrap.com |
+| API | https://maya.vaultrap.com/api | curl -k https://maya.vaultrap.com/health |
+| Health Check | https://maya.vaultrap.com/health | curl -k https://maya.vaultrap.com/health |
+| Backend Internal | http://localhost:8000 | curl http://localhost:8000/health |
 | Database | localhost:5432 | telnet localhost 5432 |
 | Redis | localhost:6379 | redis-cli ping |
 
@@ -358,7 +358,7 @@ docker compose restart backend
 ## 🔐 Important Locations
 
 ```
-/root/maya-soc-enterprise/          # Main project
+/root/maya-mvp/          # Main project
   .env                              # Configuration (NEVER COMMIT)
   docker-compose.yml                # Service definitions
   deployment/
@@ -393,12 +393,12 @@ docker compose restart
 **Q: How do I check if it's working?**
 ```bash
 docker compose ps
-curl https://app.vaultrap.com/health
+curl https://maya.vaultrap.com/health
 ```
 
 **Q: How do I get my data back?**
 ```bash
-/root/maya-soc-enterprise/deployment/backup.sh  # Create backup
+/root/maya-mvp/deployment/backup.sh  # Create backup
 # Backups auto-restore on deployment
 ```
 
@@ -422,8 +422,8 @@ ls -lah /root/backups/
 | Check status | docker compose ps | 1 sec |
 | View logs | docker compose logs -f | 1 sec |
 | Restart app | docker compose restart | 10 sec |
-| Backup database | /root/maya-soc-enterprise/deployment/backup.sh | 30 sec |
-| Deploy update | sudo /root/maya-soc-enterprise/deployment/deploy.sh | 2 min |
+| Backup database | /root/maya-mvp/deployment/backup.sh | 30 sec |
+| Deploy update | sudo /root/maya-mvp/deployment/deploy.sh | 2 min |
 | Full reset | docker compose down && docker compose up -d | 1 min |
 
 ---

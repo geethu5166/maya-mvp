@@ -27,27 +27,27 @@
 ### First Time: Setup Server
 ```bash
 # 1. SSH into your DigitalOcean droplet
-ssh root@app.vaultrap.com
+ssh root@maya.vaultrap.com
 
 # 2. Run setup script
-sudo bash /root/maya-soc-enterprise/deployment/setup.sh
+sudo bash /root/maya-mvp/deployment/setup.sh
 
 # 3. Configure environment
-nano /root/maya-soc-enterprise/.env
+nano /root/maya-mvp/.env
 
 # 4. Generate SSL certificate
-certbot certonly --standalone -d app.vaultrap.com --email your@email.com
+certbot certonly --standalone -d maya.vaultrap.com --email your@email.com
 
 # 5. Deploy application
-sudo /root/maya-soc-enterprise/deployment/deploy.sh
+sudo /root/maya-mvp/deployment/deploy.sh
 
-# ✅ Done! Access at https://app.vaultrap.com
+# ✅ Done! Access at https://maya.vaultrap.com
 ```
 
 ### Subsequent Deployments: Update Application
 ```bash
 # Pull latest code and redeploy
-sudo /root/maya-soc-enterprise/deployment/deploy.sh
+sudo /root/maya-mvp/deployment/deploy.sh
 ```
 
 ---
@@ -82,7 +82,7 @@ sudo /root/maya-soc-enterprise/deployment/deploy.sh
 ### 1. setup.sh - Initial Server Setup
 **Run once on fresh DigitalOcean droplet**
 ```bash
-sudo bash /root/maya-soc-enterprise/deployment/setup.sh
+sudo bash /root/maya-mvp/deployment/setup.sh
 ```
 **What it does:**
 - Updates system packages
@@ -100,7 +100,7 @@ sudo bash /root/maya-soc-enterprise/deployment/setup.sh
 ### 2. deploy.sh - Deploy Application
 **Run to deploy/update application**
 ```bash
-sudo /root/maya-soc-enterprise/deployment/deploy.sh
+sudo /root/maya-mvp/deployment/deploy.sh
 ```
 **What it does:**
 - Backs up current database
@@ -120,7 +120,7 @@ sudo /root/maya-soc-enterprise/deployment/deploy.sh
 ### 3. backup.sh - Create Database Backup
 **Run manually or via cron (automatic daily at 2 AM)**
 ```bash
-/root/maya-soc-enterprise/deployment/backup.sh
+/root/maya-mvp/deployment/backup.sh
 ```
 **What it does:**
 - Creates database dump
@@ -135,7 +135,7 @@ sudo /root/maya-soc-enterprise/deployment/deploy.sh
 ### 4. monitor.sh - Real-Time Monitoring
 **Run to monitor services**
 ```bash
-/root/maya-soc-enterprise/deployment/monitor.sh
+/root/maya-mvp/deployment/monitor.sh
 ```
 **What it shows:**
 - Service status
@@ -151,7 +151,7 @@ sudo /root/maya-soc-enterprise/deployment/deploy.sh
 ## ⚙️ Configuration
 
 ### nginx.conf - Web Server Configuration
-**Location**: `/root/maya-soc-enterprise/deployment/nginx.conf`
+**Location**: `/root/maya-mvp/deployment/nginx.conf`
 
 **What it does:**
 - Handles HTTPS/SSL for your domain
@@ -172,7 +172,7 @@ sudo /root/maya-soc-enterprise/deployment/deploy.sh
 ## 🏗️ Complete Architecture
 
 ```
-Your DigitalOcean Droplet (app.vaultrap.com)
+Your DigitalOcean Droplet (maya.vaultrap.com)
 │
 ├── Nginx (Port 443 HTTPS)
 │   ├── Routes / → Frontend (React)
@@ -219,7 +219,7 @@ Your DigitalOcean Droplet (app.vaultrap.com)
    ├── Wait for health
    └── Verify deployment
    ↓
-5. ✅ Application live at https://app.vaultrap.com
+5. ✅ Application live at https://maya.vaultrap.com
 ```
 
 ---
@@ -272,7 +272,7 @@ Your DigitalOcean Droplet (app.vaultrap.com)
 ```bash
 docker compose ps
 docker compose logs
-curl https://app.vaultrap.com/health
+curl https://maya.vaultrap.com/health
 ```
 
 ### Restart Application

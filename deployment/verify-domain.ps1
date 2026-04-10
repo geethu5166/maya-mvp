@@ -6,7 +6,7 @@
 $IP = "64.227.137.81"
 $DOMAIN = "vaultrap.com"
 $SUBDOMAIN = "maya.vaultrap.com"
-$APPSUBDOMAIN = "app.vaultrap.com"
+$APPSUBDOMAIN = "maya.vaultrap.com"
 
 # Colors (approximated for Windows Terminal/PowerShell)
 function Write-Info { Write-Host "[INFO]  $args" -ForegroundColor Blue }
