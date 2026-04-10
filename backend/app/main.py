@@ -213,11 +213,10 @@ async def lifespan(app: FastAPI):
             logger.info("✓ Security configuration validated")
         except ValueError as e:
             logger.error(f"✗ Security validation failed: {e}")
-            # In production, this would block startup
-            if settings.ENV == "production":
+            if settings.STARTUP_STRICT:
                 raise
             else:
-                logger.warning("⚠ Proceeding in development mode (secrets not validated)")
+                logger.warning("⚠ Proceeding in degraded mode (set STARTUP_STRICT=true to enforce)")
         
         # STEP 1.5: Initialize Unified Event Pipeline
         logger.info("Initializing unified security event pipeline...")
@@ -231,7 +230,7 @@ async def lifespan(app: FastAPI):
             logger.info("✓ Unified event pipeline initialized (Kafka + Database publishers)")
         except Exception as e:
             logger.error(f"✗ Failed to initialize unified event pipeline: {e}")
-            if settings.ENV == "production":
+            if settings.STARTUP_STRICT:
                 raise
         
         # STEP 1.6: Initialize Module Watchdog
@@ -270,7 +269,7 @@ async def lifespan(app: FastAPI):
                 logger.warning("⚠ Database initialization returned false - check connection")
         except Exception as e:
             logger.error(f"✗ Database initialization failed: {e}")
-            if settings.ENV == "production":
+            if settings.STARTUP_STRICT:
                 raise
         
         # STEP 6: Initialize Kafka event streaming (Phase 2)
@@ -284,7 +283,7 @@ async def lifespan(app: FastAPI):
                 logger.warning("⚠ Kafka initialization returned false - check broker")
         except Exception as e:
             logger.error(f"✗ Kafka initialization failed: {e}")
-            if settings.ENV == "production":
+            if settings.STARTUP_STRICT:
                 raise
         
         # STEP 7: Initialize incident detection engine (Phase 2)
