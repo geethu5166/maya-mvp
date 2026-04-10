@@ -1,6 +1,16 @@
 import { useState, useCallback, useEffect } from 'react';
 import axios, { AxiosInstance } from 'axios';
-import { LoginRequest, LoginResponse, SecurityEvent, Incident, PaginatedResponse, User } from '../types';
+import {
+  LoginRequest,
+  LoginResponse,
+  SecurityEvent,
+  Incident,
+  PaginatedResponse,
+  User,
+  SeverityLevel,
+  EventType,
+  IncidentStatus,
+} from '../types';
 
 let apiClient: AxiosInstance;
 
@@ -35,6 +45,64 @@ function getApiClient() {
   }
   return apiClient;
 }
+
+const normalizeSeverity = (value: unknown): SeverityLevel => {
+  const normalized = typeof value === 'string' ? value.toUpperCase() : '';
+  if (
+    normalized === 'CRITICAL' ||
+    normalized === 'HIGH' ||
+    normalized === 'MEDIUM' ||
+    normalized === 'LOW' ||
+    normalized === 'INFO'
+  ) {
+    return normalized as SeverityLevel;
+  }
+  return 'LOW';
+};
+
+const normalizeIncidentStatus = (value: unknown): IncidentStatus => {
+  const normalized = typeof value === 'string' ? value.toUpperCase() : '';
+  if (
+    normalized === 'DETECTED' ||
+    normalized === 'INVESTIGATING' ||
+    normalized === 'CONTAINED' ||
+    normalized === 'RESOLVED'
+  ) {
+    return normalized as IncidentStatus;
+  }
+  return 'DETECTED';
+};
+
+const normalizeEvent = (raw: any): SecurityEvent => {
+  const eventType = typeof raw?.event_type === 'string' ? raw.event_type.toLowerCase() : 'ssh_brute_force';
+  return {
+    event_id: raw?.event_id || raw?.id || raw?.eventId || `${Date.now()}`,
+    event_type: eventType as EventType,
+    severity: normalizeSeverity(raw?.severity),
+    timestamp: raw?.timestamp || raw?.created_at || new Date().toISOString(),
+    user: raw?.user || raw?.username || raw?.source_user,
+    asset: raw?.asset || raw?.source || raw?.destination,
+    source_ip: raw?.source_ip,
+    description: raw?.description || raw?.payload_short || 'Event received',
+    details: raw?.details || raw?.metadata || {},
+  };
+};
+
+const normalizeIncident = (raw: any): Incident => {
+  const events = Array.isArray(raw?.events) ? raw.events.map(normalizeEvent) : [];
+  return {
+    incident_id: raw?.incident_id || raw?.id || raw?.incidentId || `${Date.now()}`,
+    title: raw?.title || raw?.name || 'Untitled Incident',
+    description: raw?.description || raw?.summary || 'No description provided',
+    severity: normalizeSeverity(raw?.severity || raw?.priority),
+    status: normalizeIncidentStatus(raw?.status),
+    created_at: raw?.created_at || raw?.createdAt || new Date().toISOString(),
+    updated_at: raw?.updated_at || raw?.updatedAt || raw?.created_at || new Date().toISOString(),
+    events,
+    assignee: raw?.assignee,
+    tags: Array.isArray(raw?.tags) ? raw.tags : [],
+  };
+};
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
@@ -138,8 +206,15 @@ export function usePaginatedEvents(filters?: any) {
           { params: filters }
         );
         if (mounted) {
-          setEvents(response.data.items);
-          setTotal(response.data.total);
+          const data: any = response.data as any;
+          const rawItems = Array.isArray(data.items)
+            ? data.items
+            : Array.isArray(data.events)
+              ? data.events
+              : [];
+          const normalizedItems = rawItems.map(normalizeEvent);
+          setEvents(normalizedItems);
+          setTotal(data.total ?? data.count ?? normalizedItems.length);
           setError(null);
         }
       } catch (err: any) {
@@ -181,8 +256,15 @@ export function usePaginatedIncidents(filters?: any) {
           { params: filters }
         );
         if (mounted) {
-          setIncidents(response.data.items);
-          setTotal(response.data.total);
+          const data: any = response.data as any;
+          const rawItems = Array.isArray(data.items)
+            ? data.items
+            : Array.isArray(data.incidents)
+              ? data.incidents
+              : [];
+          const normalizedItems = rawItems.map(normalizeIncident);
+          setIncidents(normalizedItems);
+          setTotal(data.total ?? data.count ?? normalizedItems.length);
           setError(null);
         }
       } catch (err: any) {
