@@ -22,6 +22,7 @@ from fastapi.middleware.base import BaseHTTPMiddleware
 from fastapi.responses import JSONResponse
 
 from app.core.config import get_settings
+from app.core.logging_config import setup_logging, get_logger
 from app.core.event_bus import event_bus
 from app.core.event_pipeline import create_production_pipeline, ProductionEventPipeline
 from app.core.health_checks import (
@@ -37,11 +38,9 @@ from app.services.kafka_service import event_processor, initialize_event_streami
 from app.services.incident_detection_engine import detection_engine
 from app.services.monitoring import monitoring
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
+# Initialize enterprise-grade logging with structured JSON output
+setup_logging()
+logger = get_logger(__name__)
 
 settings = get_settings()
 

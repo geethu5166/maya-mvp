@@ -21,6 +21,9 @@ from sqlalchemy.orm import relationship, Session
 from datetime import datetime
 from enum import Enum as PyEnum
 import uuid
+import logging
+
+logger = logging.getLogger(__name__)
 
 Base = declarative_base()
 
@@ -601,10 +604,10 @@ class MetricSnapshot(Base):
 def create_all_tables(engine, echo=False):
     """Create all tables in the database"""
     Base.metadata.create_all(engine, checkfirst=True)
-    print("✅ All database tables created successfully")
+    logger.info("All database tables created successfully")
 
 
 def drop_all_tables(engine):
     """Drop all tables (for testing/reset only)"""
     Base.metadata.drop_all(engine)
-    print("✅ All database tables dropped")
+    logger.warning("All database tables dropped - TESTING/RESET ONLY")
