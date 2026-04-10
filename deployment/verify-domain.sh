@@ -20,6 +20,12 @@ IP="64.227.137.81"
 DOMAIN="vaultrap.com"
 SUBDOMAIN="maya.vaultrap.com"
 APP_SUBDOMAIN="app.vaultrap.com"
+PROJECT_DIR="/root/maya-mvp"
+
+# Backward compatibility if old project folder still exists on server
+if [ ! -d "$PROJECT_DIR" ] && [ -d "/root/maya-soc-enterprise" ]; then
+    PROJECT_DIR="/root/maya-soc-enterprise"
+fi
 
 log_info() { echo -e "${BLUE}[INFO]${NC} $1"; }
 log_success() { echo -e "${GREEN}[✓]${NC} $1"; }
@@ -175,16 +181,16 @@ log_info "Checking Local Configuration..."
 echo ""
 
 # Check .env file
-if [ -f "/root/maya-soc-enterprise/.env" ]; then
+if [ -f "$PROJECT_DIR/.env" ]; then
     log_success ".env file exists"
     
-    if grep -q "DOMAIN=$DOMAIN\|DOMAIN=maya.vaultrap.com" /root/maya-soc-enterprise/.env 2>/dev/null; then
+    if grep -q "DOMAIN=$DOMAIN\|DOMAIN=maya.vaultrap.com" "$PROJECT_DIR/.env" 2>/dev/null; then
         log_success ".env has correct domain configuration"
     else
         log_warning ".env domain may need updating - should be: maya.vaultrap.com"
     fi
 else
-    log_warning ".env file not found (expected at /root/maya-soc-enterprise/.env)"
+    log_warning ".env file not found (expected at $PROJECT_DIR/.env)"
 fi
 
 echo ""
@@ -215,9 +221,9 @@ log_info "Checking Docker Services..."
 echo ""
 
 if command -v docker &> /dev/null; then
-    if docker compose -f /root/maya-soc-enterprise/docker-compose.yml ps 2>/dev/null | grep -q "Up"; then
+    if docker compose -f "$PROJECT_DIR/docker-compose.yml" ps 2>/dev/null | grep -q "Up"; then
         log_success "Docker services running"
-        docker compose -f /root/maya-soc-enterprise/docker-compose.yml ps 2>/dev/null | tail -n +2 | while read line; do
+        docker compose -f "$PROJECT_DIR/docker-compose.yml" ps 2>/dev/null | tail -n +2 | while read line; do
             if echo "$line" | grep -q "Up"; then
                 log_success "  $(echo $line | awk '{print $1}' | sed 's/-//')"
             else
