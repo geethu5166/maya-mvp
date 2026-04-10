@@ -89,6 +89,7 @@ services:
       - "--storage.tsdb.retention.time=30d"
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./alert_rules.yml:/etc/prometheus/alert_rules.yml:ro
       - prometheus_data:/prometheus
     ports:
       - "9090:9090"
@@ -128,8 +129,6 @@ services:
         condition: service_healthy
       kafka:
         condition: service_started
-      prometheus:
-        condition: service_healthy
     environment:
       # Application
       ENV: ${ENV:-development}
